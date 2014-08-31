@@ -8,17 +8,18 @@ import java.util.HashMap;
 public class Micro {
     public static final HashMap<Integer, String> TOKEN_NAMES = new HashMap<Integer, String>();
     static {
-        TOKEN_NAMES.put(MicroParser.KEYWORD, "KEYWORD");
-        TOKEN_NAMES.put(MicroParser.OPERATOR, "OPERATOR");
-        TOKEN_NAMES.put(MicroParser.IDENTIFIER, "IDENTIFIER");
-        TOKEN_NAMES.put(MicroParser.FLOATLITERAL, "FLOATLITERAL");
-        TOKEN_NAMES.put(MicroParser.INTLITERAL, "INTLITERAL");
-        TOKEN_NAMES.put(MicroParser.STRINGLITERAL, "STRINGLITERAL");
+        TOKEN_NAMES.put(MicroScanner.KEYWORD, "KEYWORD");
+        TOKEN_NAMES.put(MicroScanner.OPERATOR, "OPERATOR");
+        TOKEN_NAMES.put(MicroScanner.IDENTIFIER, "IDENTIFIER");
+        TOKEN_NAMES.put(MicroScanner.FLOATLITERAL, "FLOATLITERAL");
+        TOKEN_NAMES.put(MicroScanner.INTLITERAL, "INTLITERAL");
+        TOKEN_NAMES.put(MicroScanner.STRINGLITERAL, "STRINGLITERAL");
     }
 
     public static void main(String[] args) {
         if(args.length < 1) {
             System.err.println("File argument was not provided.");
+            return;
         }
         ScanSource(args[0]);
     }
@@ -26,14 +27,17 @@ public class Micro {
     private static void ScanSource(String filename) {
         try {
             CharStream src = new ANTLRFileStream(filename);
-            MicroParser lexer = new MicroParser(src);
+            MicroScanner lexer = new MicroScanner(src);
             while(true) {
                 Token token = lexer.nextToken();
-                if(token.getType() == MicroParser.EOF) {
+                if(token.getType() == MicroScanner.EOF) {
                     break;
                 }
-                System.out.println("Token Type: " + TOKEN_NAMES.get(token.getType()));
-                System.out.println("Value: " + token.getText());
+                String tokenName = TOKEN_NAMES.get(token.getType());
+                if(tokenName != null) {
+                    System.out.println("Token Type: " + TOKEN_NAMES.get(token.getType()));
+                    System.out.println("Value: " + token.getText());
+                }
             }
         }
         catch(IOException ex) {
