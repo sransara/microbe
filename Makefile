@@ -1,20 +1,21 @@
 LIB_ANTLR := lib/antlr.jar
-ANTLR_SCRIPT := Micro.g4
+ANTLR_SCRIPT := MicroParser.g4
 
-all: group compiler
+all: parser compiler
 
-group:
-	@echo "sabeysir"
+parser:
+	java -cp $(LIB_ANTLR) org.antlr.v4.Tool -o src $(ANTLR_SCRIPT)
 
 compiler:
-	rm -rf build
-	mkdir build
-	java -cp $(LIB_ANTLR) org.antlr.v4.Tool -o build $(ANTLR_SCRIPT)
 	rm -rf classes
 	mkdir classes
-	javac -cp $(LIB_ANTLR) -d classes src/*.java build/*.java
+	javac -cp $(LIB_ANTLR) -d classes src/*.java
 
 clean:
-	rm -rf classes build
+	rm -rf classes 
+	rm src/MicroParser.java src/MicroParser.tokens
 
-.PHONY: all group compiler clean
+test:
+	py test/testall.py	
+
+.PHONY: all parser compiler clean test
