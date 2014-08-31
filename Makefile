@@ -12,10 +12,19 @@ compiler:
 	javac -cp $(LIB_ANTLR) -d classes src/*.java
 
 clean:
-	rm -rf classes 
+	rm -rf classes sabeysir
 	rm src/MicroParser.java src/MicroParser.tokens
 
 test:
-	py test/testall.py	
+	py test/testall.py
 
-.PHONY: all parser compiler clean test
+submit:
+	make clean
+	mkdir sabeysir
+	cp Makefile.s sabeysir/Makefile
+	cp MicroParser.g4 sabeysir/
+	cp -r src sabeysir/
+	cp -r lib sabeysir/
+	echo "Folder sabeysir is ready to be submitted"
+
+.PHONY: all parser compiler clean test submit
