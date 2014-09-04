@@ -14,6 +14,8 @@ public class Micro {
         TOKEN_NAMES.put(MicroScanner.FLOATLITERAL, "FLOATLITERAL");
         TOKEN_NAMES.put(MicroScanner.INTLITERAL, "INTLITERAL");
         TOKEN_NAMES.put(MicroScanner.STRINGLITERAL, "STRINGLITERAL");
+        TOKEN_NAMES.put(MicroScanner.COMMENT, "COMMENT");
+        TOKEN_NAMES.put(MicroScanner.WHITES, "WHITES");
     }
 
     public static void main(String[] args) {
@@ -33,9 +35,10 @@ public class Micro {
                 if(token.getType() == MicroScanner.EOF) {
                     break;
                 }
-                String tokenName = TOKEN_NAMES.get(token.getType());
-                if(tokenName != null) {
-                    System.out.println("Token Type: " + TOKEN_NAMES.get(token.getType()));
+                int ttype = token.getType();
+                String tokenName = TOKEN_NAMES.get(ttype);
+                if(ttype != MicroScanner.WHITES && ttype != MicroScanner.COMMENT) {
+                    System.out.println("Token Type: " + tokenName);
                     System.out.println("Value: " + token.getText());
                 }
             }

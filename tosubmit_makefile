@@ -1,5 +1,5 @@
 LIB_ANTLR := lib/antlr.jar
-ANTLR_SCRIPT := MicroParser.g4
+ANTLR_SCRIPT := MicroScanner.g4
 
 all: group compiler
 
@@ -14,7 +14,11 @@ compiler:
 	mkdir classes
 	javac -cp $(LIB_ANTLR) -d classes src/*.java build/*.java
 
+test:
+	rm -rf test/*.myout
+	python test/testall.py
+
 clean:
 	rm -rf classes build
 
-.PHONY: all group compiler clean
+.PHONY: all group compiler clean test

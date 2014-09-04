@@ -8,7 +8,10 @@ for fname in os.listdir(testdir):
         micro = testdir + fname
         myout = testdir + fname.replace('.micro', '.myout')
         trout = testdir + fname.replace('.micro', '.out')
-        excommand = 'java -cp lib/antlr.jar;classes/ Micro '+ micro + ' > ' + myout
+        if os.name == "posix":
+            excommand = 'java -cp lib/antlr.jar:classes/ Micro '+ micro + ' > ' + myout
+        else:
+            excommand = 'java -cp lib/antlr.jar;classes/ Micro '+ micro + ' > ' + myout
         dfcommand = 'diff -b -B ' + myout + ' ' + trout
         print "Testing file:", fname
         os.system(excommand);

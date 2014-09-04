@@ -41,7 +41,7 @@ INTLITERAL:     DIGIT+;
 STRINGLITERAL:  '"' (~["\r\n])*? '"';
 IDENTIFIER:     CHAR (DIGIT | CHAR)*;
 COMMENT:        '--' ~[\r\n]*? '\r'? '\n' -> channel(HIDDEN) ;
-WS:             [ \r\n\t]+ -> channel(HIDDEN) ;
+WHITES:             [ \r\n\t]+ -> channel(HIDDEN) ;
 
 fragment CHAR:  [a-zA-Z];
 fragment DIGIT: [0-9];

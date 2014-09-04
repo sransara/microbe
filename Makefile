@@ -13,19 +13,23 @@ compiler:
 
 test:
 	rm -rf test/*.myout
-	py test/testall.py
+	python test/testall.py
 
-submit:
+rsubmit:
 	make clean
 	mkdir sabeysir
 	cp tosubmit_makefile sabeysir/Makefile
 	cp $(ANTLR_SCRIPT).g4 sabeysir/
 	cp -r src sabeysir/
 	cp -r lib sabeysir/
-	echo "Folder sabeysir is ready to be submitted"
+	cp -r test sabeysir/
+	@echo "Folder sabeysir is ready to be submitted"
+
+submit:
+	@sh submit.bash
 
 clean:
 	rm -rf classes sabeysir
 	rm -f src/$(ANTLR_SCRIPT).java src/$(ANTLR_SCRIPT).tokens
 
-.PHONY: all parser compiler clean test submit
+.PHONY: all parser compiler clean test rsubmit submit
