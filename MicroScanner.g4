@@ -36,13 +36,12 @@ INT: 'INT' -> type(KEYWORD);
 FLOAT: 'FLOAT' -> type(KEYWORD);
 STRING: 'STRING' -> type(KEYWORD);
 
-IDENTIFIER:     CHAR (DIGIT | CHAR)*;
 FLOATLITERAL:   DIGIT* '.' DIGIT+;
 INTLITERAL:     DIGIT+;
-STRINGLITERAL:  '"' (~'"')*? '"';
+STRINGLITERAL:  '"' (~["\r\n])*? '"';
+IDENTIFIER:     CHAR (DIGIT | CHAR)*;
 COMMENT:        '--' ~[\r\n]*? '\r'? '\n' -> channel(HIDDEN) ;
 WS:             [ \r\n\t]+ -> channel(HIDDEN) ;
 
 fragment CHAR:  [a-zA-Z];
 fragment DIGIT: [0-9];
-

@@ -18,7 +18,7 @@ test:
 submit:
 	make clean
 	mkdir sabeysir
-	cp Makefile.s sabeysir/Makefile
+	cp tosubmit_makefile sabeysir/Makefile
 	cp $(ANTLR_SCRIPT).g4 sabeysir/
 	cp -r src sabeysir/
 	cp -r lib sabeysir/
