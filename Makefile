@@ -1,6 +1,5 @@
 LIB_ANTLR := lib/antlr.jar
-ANTLR_SCRIPT := MicroScanner
-
+ANTLR_SCRIPT := Microbe
 all: parser compiler
 
 parser:
@@ -12,7 +11,8 @@ compiler:
 	javac -cp $(LIB_ANTLR) -d classes src/*.java
 
 test:
-	rm -rf test/*.myout
+	touch 'test/temp.myout'
+	rm -rf 'test/*.myout'
 	python test/testall.py
 
 rsubmit:
@@ -29,7 +29,10 @@ submit:
 	@sh submit.bash
 
 clean:
+	touch 'test/temp.myout'
+	rm -rf 'test/*.myout'
 	rm -rf classes sabeysir
-	rm -f src/$(ANTLR_SCRIPT).java src/$(ANTLR_SCRIPT).tokens
+	touch 'src/Microbe.temp'
+	rm -rf 'src/Microbe*'
 
 .PHONY: all parser compiler clean test rsubmit submit
