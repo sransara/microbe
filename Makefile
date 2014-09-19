@@ -12,7 +12,7 @@ compiler:
 
 test:
 	touch 'test/temp.myout'
-	rm -rf 'test/*.myout'
+	rm -rf test/*.myout
 	python test/testall.py
 
 rsubmit:
@@ -30,9 +30,9 @@ submit:
 
 clean:
 	touch 'test/temp.myout'
-	rm -rf 'test/*.myout'
+	rm -rf test/*.myout
 	rm -rf classes sabeysir
 	touch 'src/Microbe.temp'
-	rm -rf 'src/Microbe*'
+	rm -rf src/Microbe*
 
 .PHONY: all parser compiler clean test rsubmit submit

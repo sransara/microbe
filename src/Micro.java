@@ -28,7 +28,7 @@ public class Micro {
     private static ParseTree ParseSource(ANTLRInputStream input) {
         MicrobeLexer lexer = new MicrobeLexer(input);
         MicrobeParser parser = new MicrobeParser(new CommonTokenStream(lexer));
-        parser.setErrorHandler(new BailErrorStrategy());
+        parser.setErrorHandler(new CustomErrorStrategy());
 
         ParseTree tree = null;
         Boolean success = true;

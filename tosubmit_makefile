@@ -1,10 +1,10 @@
 LIB_ANTLR := lib/antlr.jar
-ANTLR_SCRIPT := Micro.g4
+ANTLR_SCRIPT := Microbe.g4
 
 all: group compiler
 
 group:
-	@echo "Samodya Abeysiriwardane - sabeysir"
+	@echo "sabeysir"
 
 compiler:
 	rm -rf build

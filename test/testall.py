@@ -2,6 +2,25 @@
 import os
 import subprocess
 
+# For ecn server to subprocess
+def fn_check_output():
+    def f(*popenargs, **kwargs):
+        if 'stdout' in kwargs:
+            raise ValueError('stdout argument not allowed, it will be overridden.')
+        process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
+        output, unused_err = process.communicate()
+        retcode = process.poll()
+        if retcode:
+            cmd = kwargs.get("args")
+            if cmd is None:
+                cmd = popenargs[0]
+            raise subprocess.CalledProcessError(retcode, cmd)
+        return output
+    return f
+
+if "check_output" not in dir(subprocess): 
+    subprocess.check_output = fn_check_output()
+
 errors = False
 testdir = './test/'
 for fname in os.listdir(testdir):
@@ -24,3 +43,4 @@ for fname in os.listdir(testdir):
             print "--- Failed testcase for ", fname
 
 if(errors): exit(1)
+
