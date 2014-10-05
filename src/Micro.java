@@ -19,7 +19,7 @@ public class Micro {
               return;
             }
             SymbolScopeTree sst = mParser.sst;
-            sst.printTree("GLOBAL", sst.globalScope);
+            sst.printTree("GLOBAL", sst.GlobalScope);
         }
         catch (IOException ex) {
             System.err.print("To be or not to be. The file thought to not to be.");

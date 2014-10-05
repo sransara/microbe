@@ -3,15 +3,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+enum ScopeType {
+    GLOBAL, BLOCK, FUNCTION
+}
+
+enum VarType {
+    STRING, INT, FLOAT, VOID
+}
+
 public class SymbolScopeTree {
-    public enum ScopeType {
-        GLOBAL, BLOCK, FUNCTION
-    }
-
-    public enum VarType {
-        STRING, INT, FLOAT, VOID
-    }
-
     class Symbol<T> {
         VarType type;
         String name;
@@ -134,13 +134,12 @@ public class SymbolScopeTree {
 
     }
 
-    public SymbolScopeNode globalScope;
+    public SymbolScopeNode GlobalScope = new SymbolScopeNode(ScopeType.GLOBAL);
     public SymbolScopeNode currentScope;
     private int blockCount = 1;
 
     public SymbolScopeTree() {
-        globalScope = new SymbolScopeNode(ScopeType.GLOBAL);
-        currentScope = globalScope;
+        currentScope = GlobalScope;
     }
 
     public void exitScope() {
