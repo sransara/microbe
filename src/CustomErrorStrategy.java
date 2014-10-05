@@ -1,9 +1,5 @@
-package org.antlr.v4.runtime;
-
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.DefaultErrorStrategy;
-import org.antlr.v4.runtime.InputMismatchException;
+import org.antlr.v4.runtime.*;
 
 
 public class CustomErrorStrategy extends DefaultErrorStrategy {

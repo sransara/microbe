@@ -14,12 +14,12 @@ public class Micro {
         }
         try {
             ANTLRInputStream input = new ANTLRFileStream(args[0]);
-            MirobeParser mParser = parseSource(input);
-            if(mbparser == null) {
+            MicrobeParser mParser = parseSource(input);
+            if(mParser == null) {
               return;
             }
-            SymbolTableTree mSymbols = mParser.symbols;
-            mSymbols.printSymbolTables();
+            SymbolScopeTree sst = mParser.sst;
+            sst.printTree("GLOBAL", sst.globalScope);
         }
         catch (IOException ex) {
             System.err.print("To be or not to be. The file thought to not to be.");
@@ -38,7 +38,6 @@ public class Micro {
             tree = parser.program();
         } catch (ParseCancellationException e) {
             System.err.print("Not accepted");
-            return null;
         }
         return parser;
     }
