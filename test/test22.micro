@@ -7,22 +7,27 @@ BEGIN
      
 	FUNCTION VOID main()
 	BEGIN
-		i := 0;
+	     INT iprime;
+
+		i := 0;		
 		iprime := 0;
 		j := 0;
 		result := 0;
 		
 		WHILE (i < 100)
+		     INT jprime;
+		
+		     jprime := j;
 		     i := i + 1;
 		     IF (i > 69)
 		          CONTINUE;
 		     ENDIF
 		     iprime := iprime + 1;
-		     WHILE (j < 100)
-		          IF (j > 49)
+		     WHILE (jprime < 100)
+		          IF (jprime > 49)
 		               BREAK;
 		          ENDIF
-		          j := j + 1;
+		          jprime := j + 1;
 	               result := result + 1;
 		     ENDWHILE
 		ENDWHILE

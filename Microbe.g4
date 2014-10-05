@@ -1,9 +1,16 @@
 grammar Microbe;
 
-program: PROGRAM id BEGIN pgm_body END ;
+@member: {
+  public SymbolTableTree symbols;
+}
+
+program: PROGRAM id BEGIN pgm_body END { symbols = new SymbolTableTree(); };
 id: IDENTIFIER ;
 pgm_body: decl func_declarations ;
-decl: string_decl decl | var_decl decl | ;
+decl: string_decl decl
+    | var_decl decl
+    |
+    ;
 
 /* Global String Declaration */
 string_decl: STRING id ASSIGN str SEMICOLON ;
@@ -98,7 +105,7 @@ INTLITERAL:     DIGIT+;
 STRINGLITERAL:  '"' (~["\r\n])*? '"';
 IDENTIFIER:     CHAR (DIGIT | CHAR)*;
 COMMENT:        '--' ~[\r\n]*? '\r'? '\n' -> channel(HIDDEN) ;
-WHITES:             [ \r\n\t]+ -> channel(HIDDEN) ;
+WHITES:         [ \r\n\t]+ -> channel(HIDDEN) ;
 
 fragment CHAR:  [a-zA-Z];
 fragment DIGIT: [0-9];
