@@ -39,6 +39,8 @@ for fname in os.listdir(testdir):
         try:
             dfout = subprocess.check_output(dfcommand, shell=True);
         except:
+            dyfcommand = 'diff -y ' + myout + ' ' + trout
+            os.system(dyfcommand)
             errors = True
             print "--- Failed testcase for ", fname
 
