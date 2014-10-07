@@ -2,7 +2,7 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.*;
 
 
-public class CustomErrorStrategy extends DefaultErrorStrategy {
+public class MicroErrorStrategy extends DefaultErrorStrategy {
   @Override
   public void reportError(Parser recognizer, RecognitionException e)
   {

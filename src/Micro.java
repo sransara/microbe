@@ -30,7 +30,7 @@ public class Micro {
     private static MicrobeParser parseSource(ANTLRInputStream input) {
         MicrobeLexer lexer = new MicrobeLexer(input);
         MicrobeParser parser = new MicrobeParser(new CommonTokenStream(lexer));
-        parser.setErrorHandler(new CustomErrorStrategy());
+        parser.setErrorHandler(new MicroErrorStrategy());
 
         ParseTree tree = null;
         Boolean success = true;

@@ -136,7 +136,7 @@ public class SymbolScopeTree {
 
     public SymbolScopeNode GlobalScope = new SymbolScopeNode(ScopeType.GLOBAL);
     public SymbolScopeNode currentScope;
-    private int blockCount = 1;
+    private int blockx = 1;
 
     public SymbolScopeTree() {
         currentScope = GlobalScope;
@@ -155,7 +155,7 @@ public class SymbolScopeTree {
 
     public void enterScope() {
         SymbolScopeNode ns = new SymbolScopeNode(ScopeType.BLOCK, currentScope);
-        String name = "BLOCK " + blockCount; blockCount += 1;
+        String name = "BLOCK " + blockx; blockx++;
         currentScope.children.put(name, ns);
         currentScope = ns;
     }
