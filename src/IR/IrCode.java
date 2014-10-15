@@ -26,4 +26,8 @@ public class IrCode {
             System.out.println(n.toAssembly());
         }
     }
+    
+    public boolean isTempResult() {
+      return result.startsWith("$T");
+    }
 }

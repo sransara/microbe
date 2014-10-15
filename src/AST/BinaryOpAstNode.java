@@ -112,7 +112,7 @@ public class BinaryOpAstNode extends AstNode{
         self.irNodeList.addAll(rC.irNodeList);
 
         if(lC.type == VariableType.INT) {
-            if(rC.result.startsWith("$T")) {
+            if(rC.isTempResult()) {
                 self.irNodeList.add(new STypeIrNode(IrNode.Opcode.STOREI, rC.result, lC.result));
             }
             else {
@@ -122,7 +122,7 @@ public class BinaryOpAstNode extends AstNode{
             self.type = lC.type;
         }
         else if(lC.type == VariableType.FLOAT) {
-            if(rC.result.startsWith("$T")) {
+            if(rC.isTempResult()) {
                 self.irNodeList.add(new STypeIrNode(IrNode.Opcode.STOREF, rC.result, lC.result));
             }
             else {

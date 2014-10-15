@@ -38,6 +38,7 @@ public class Micro {
                 n.PrintAssembly();
             }
             System.out.println("sys halt");
+            System.out.println("end");
         }
         catch (IOException ex) {
             System.err.print("To be or not to be. The file thought to not to be.");
