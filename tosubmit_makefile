@@ -1,5 +1,6 @@
 LIB_ANTLR := lib/antlr.jar
 ANTLR_SCRIPT := Microbe.g4
+PATH_SEP := ;
 
 all: group compiler
 
@@ -12,9 +13,11 @@ compiler:
 	java -cp $(LIB_ANTLR) org.antlr.v4.Tool -o build $(ANTLR_SCRIPT)
 	rm -rf classes
 	mkdir classes
-	javac -cp $(LIB_ANTLR) -d classes src/*.java build/*.java
+	javac -d classes src/SymbolScope/*.java src/AST/*.java src/IR/*.java
+	javac -cp $(LIB_ANTLR)$(PATH_SEP)classes$(PATH_SEP) -d classes src/*.java build/*.java
 
 test:
+	touch test/temp.myout
 	rm -rf test/*.myout
 	python test/testall.py
 

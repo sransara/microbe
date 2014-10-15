@@ -3,23 +3,21 @@ import org.antlr.v4.runtime.*;
 
 
 public class MicroErrorStrategy extends DefaultErrorStrategy {
-  @Override
-  public void reportError(Parser recognizer, RecognitionException e)
-  {
+    // Make no judgements this was a project step requirement,
+    // and error reporting is not a big deal at this point of development
+    @Override
+    public void reportError(Parser recognizer, RecognitionException e)
+    {
     throw new ParseCancellationException(e);
-  }
+    }
 
-  /** Make sure we don't attempt to recover inline; if the parser
-   *  successfully recovers, it won't throw an exception.
-   */
-  @Override
-  public Token recoverInline(Parser recognizer) throws RecognitionException
-  {
+    @Override
+    public Token recoverInline(Parser recognizer) throws RecognitionException
+    {
     InputMismatchException e = new InputMismatchException(recognizer);
     throw new ParseCancellationException(e);
-  }
+    }
 
-  /** Make sure we don't attempt to recover from problems in subrules. */
-  @Override
-  public void sync(Parser recognizer) { }
+    @Override
+    public void sync(Parser recognizer) { }
 }

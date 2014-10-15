@@ -1,5 +1,6 @@
 LIB_ANTLR := lib/antlr.jar
 ANTLR_SCRIPT := Microbe
+PATH_SEP := ;
 all: parser compiler
 
 parser:
@@ -8,7 +9,8 @@ parser:
 compiler:
 	rm -rf classes
 	mkdir classes
-	javac -cp $(LIB_ANTLR) -d classes src/*.java
+	javac -d classes src/SymbolScope/*.java src/AST/*.java src/IR/*.java
+	javac -cp $(LIB_ANTLR)$(PATH_SEP)classes$(PATH_SEP) -d classes src/*.java
 
 test:
 	touch 'test/temp.myout'

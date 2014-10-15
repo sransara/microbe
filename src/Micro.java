@@ -1,10 +1,15 @@
 /**
  * Created by Sam Abeysiriwardane
  */
+import AST.AstNode;
+import IR.IrCode;
+import IR.IrCodeState;
+import SymbolScope.SymbolScopeTree;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import java.io.IOException;
+import java.util.Set;
 
 public class Micro {
     public static void main(String[] args) {
@@ -19,7 +24,20 @@ public class Micro {
               return;
             }
             SymbolScopeTree sst = mParser.sst;
-            sst.printTree("GLOBAL", sst.GlobalScope);
+            IrCodeState.CURRENT_SCOPE = sst.GlobalScope.children.get("main");
+            IrCodeState.CURRENT_SCOPE.generateIrCode();
+            for(IrCode n : IrCodeState.CURRENT_SCOPE.irCodeList) {
+                n.PrintIrCode();
+            }
+
+            Set<String> symbolNames = sst.GlobalScope.symbolTable.keySet();
+            for (String symbolName : symbolNames) {
+                System.out.println(sst.GlobalScope.symbolTable.get(symbolName));
+            }
+            for(IrCode n : IrCodeState.CURRENT_SCOPE.irCodeList) {
+                n.PrintAssembly();
+            }
+            System.out.println("sys halt");
         }
         catch (IOException ex) {
             System.err.print("To be or not to be. The file thought to not to be.");
