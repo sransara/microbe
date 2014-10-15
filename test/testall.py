@@ -19,7 +19,7 @@ def fn_check_output():
         return output
     return f
 
-if "check_output" not in dir(subprocess): 
+if "check_output" not in dir(subprocess):
     subprocess.check_output = fn_check_output()
 
 errors = False
@@ -29,26 +29,29 @@ for fname in os.listdir(testdir):
         micro = testdir + fname
         myout = testdir + fname.replace('.micro', '.myout')
         trout = testdir + fname.replace('.micro', '.out')
+        mout = testdir + fname.replace('.micro', '.m.myout')
+        tout = testdir + fname.replace('.micro', '.t.out')
 
         connector = ";"
         if os.name == "posix": connector = ":"
         excommand = 'java -ea -cp lib/antlr.jar' + connector + 'classes/ Micro '+ micro + ' > ' + myout
-        dfcommand = 'diff -b -B ' + myout + ' ' + trout
+        t1xcommand = testdir + 'tinyR ' + myout + ' > ' + mout
+        t2xcommand = testdir + 'tinyR ' + trout + ' > ' + tout
+        dfcommand = 'diff -y ' + mout + ' ' + tout
 
         print "Testing file:", fname
         try:
-            exout = subprocess.check_output(excommand, shell=True);
+            print(excommand)
+            subprocess.check_output(excommand, shell=True);
+            print(t1xcommand)
+            subprocess.check_output(t1xcommand, shell=True);
+            print(t2xcommand)
+            subprocess.check_output(t2xcommand, shell=True);
         except:
             print "--- Run time error"
             exit(1)
 
-        try:
-            dfout = subprocess.check_output(dfcommand, shell=True);
-        except:
-            dyfcommand = 'diff -y ' + myout + ' ' + trout
-            os.system(dyfcommand)
-            errors = True
-            print "--- Failed testcase for ", fname
+        os.system(dfcommand)
 
 if(errors): exit(1)
 
