@@ -25,7 +25,7 @@ public class ITypeIrNode extends IrNode{
             case READI: a.append("readi "); break;
             case READS: a.append("reads "); break;
         }
-        a.append(result.replace("$T", "r"));
+        a.append(ttoreg(result));
         return a.toString();
     }
 }

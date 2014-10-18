@@ -20,9 +20,9 @@ public class RTypeIrNode extends IrNode{
     @Override
     public String toAssembly() {
         StringBuilder a = new StringBuilder("move ");
-        a.append(op1.replace("$T", "r") + " ");
-        a.append(result.replace("$T", "r"));
-        a.append("\n");
+        a.append(ttoreg(op1) + " ");
+        a.append(ttoreg(result) + "\n");
+
         switch(opcode) {
             case ADDF: a.append("addr "); break;
             case ADDI: a.append("addi "); break;
@@ -33,8 +33,8 @@ public class RTypeIrNode extends IrNode{
             case DIVF: a.append("divr "); break;
             case DIVI: a.append("divi "); break;
         }
-        a.append(op2.replace("$T", "r") + " ");
-        a.append(result.replace("$T", "r"));
+        a.append(ttoreg(op2) + " ");
+        a.append(ttoreg(result));
         return a.toString();
     }
 }

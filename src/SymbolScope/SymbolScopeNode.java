@@ -11,7 +11,7 @@ public class SymbolScopeNode {
     SymbolScopeTree.ScopeType scopeType;
     SymbolScopeNode parent;
     VariableType returnType = null;
-    String name = null;
+    public String name = null;
     public Map<String, SymbolScopeNode> children = new LinkedHashMap<String, SymbolScopeNode>();
     public Map<String, Symbol> symbolTable =  new LinkedHashMap<String, Symbol>();
     public List<AstNode> statements = null;
@@ -95,10 +95,6 @@ public class SymbolScopeNode {
             s = parent.findSymbol(id);
         }
         return s;
-    }
-
-    public void addStatements(List<AstNode> s) {
-        this.statements = s;
     }
 
     public void generateIrCode() {

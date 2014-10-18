@@ -2,10 +2,8 @@ package IR;
 
 public abstract class IrNode {
     public static enum Opcode {
-        ADDI, ADDF,
-        SUBI, SUBF,
-        MULTI, MULTF,
-        DIVI, DIVF,
+        ADDI, SUBI, MULTI, DIVI,
+        ADDF, SUBF, MULTF, DIVF,
         STOREI, STOREF,
         GT, GE, LT, LE, NE, EQ,
         JUMP,
@@ -23,5 +21,9 @@ public abstract class IrNode {
 
     public abstract String toString();
 
-    public String toAssembly() { return "--todo as conversion--"; }
+    public abstract String toAssembly();
+
+    protected String ttoreg(String temp) {
+        return temp.replace("$T", "r");
+    }
 }

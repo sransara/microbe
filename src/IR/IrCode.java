@@ -13,7 +13,7 @@ public class IrCode {
     public RLValue rlvalue = RLValue.LVALUE;
     public List<IrNode> irNodeList = new LinkedList<IrNode>();
     public String result;
-    public VariableType type;
+    public VariableType type = VariableType.VOID;
 
     public void PrintIrCode() {
         for(IrNode n : irNodeList) {

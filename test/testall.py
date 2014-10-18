@@ -24,6 +24,8 @@ if "check_output" not in dir(subprocess):
 
 errors = False
 testdir = './test/'
+nonsense = 'start ' if sys.platform.startswith('win') else ''
+
 for fname in os.listdir(testdir):
     if(fname.endswith('.micro') and (len(sys.argv) == 1 or fname.startswith(sys.argv[1]))):
         micro = testdir + fname
@@ -35,8 +37,8 @@ for fname in os.listdir(testdir):
         connector = ";"
         if os.name == "posix": connector = ":"
         excommand = 'java -ea -cp lib/antlr.jar' + connector + 'classes/ Micro '+ micro + ' > ' + myout
-        t1xcommand = testdir + 'tinyR ' + myout + ' > ' + mout
-        t2xcommand = testdir + 'tinyR ' + trout + ' > ' + tout
+        t1xcommand = nonsense + testdir + 'tinyR ' + myout + ' > ' + mout
+        t2xcommand = nonsense + testdir + 'tinyR ' + trout + ' > ' + tout
         dfcommand = 'diff -y ' + mout + ' ' + tout
 
         print "Testing file:", fname

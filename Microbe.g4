@@ -1,18 +1,13 @@
 grammar Microbe;
 
 @header {
-  import java.util.LinkedList;
-  import SymbolScope.SymbolScopeTree;
-  import SymbolScope.VariableType;
-  import AST.AstNode;
-  import AST.BinaryOpAstNode;
-  import AST.IdentifierAstNode;
-  import AST.LiteralAstNode;
-  import AST.SystemOpAstNode;
+    import java.util.LinkedList;
+    import SymbolScope.*;
+    import AST.*;
 }
 
 @members {
-  public SymbolScopeTree sst = new SymbolScopeTree();
+    public SymbolScopeTree sst = new SymbolScopeTree();
 }
 
 // implicitly instantiates SymbolScope.SymbolScopeTree: sst
@@ -87,35 +82,41 @@ func_decl:
         sst.exitScope();
     }
     ;
-func_body returns [List<AstNode> stmts]: decl stmt_list
+func_body: decl stmt_list
     {
-        sst.currentScope.addStatements($stmt_list.stmts);
+        sst.currentScope.statements = $stmt_list.stmts;
     };
 
 /* Complex Statements and Condition */
-cond: expr compop expr ;
-compop: GT | LT | EQUALS | NEQUALS | GTE | LTE ;
 if_stmt returns [AstNode node]:
     IF OPAREN cond CPAREN
     {
         sst.enterScope();
+        $node = new IfAstNode(sst.currentScope.name, $cond.node, null, null);
     }
     decl
     stmt_list
     {
+        ((IfAstNode)$node).then = $stmt_list.stmts;
         sst.exitScope();
     }
     else_part
-    ENDIF ;
+    ENDIF
+    {
+        ((IfAstNode)$node).otherwise = $else_part.node;
+    }
+    ;
 
-else_part:
+else_part returns [IfAstNode node]:
     ELSE
     {
         sst.enterScope();
+        $node = new IfAstNode(sst.currentScope.name, null, null, null);
     }
     decl
     stmt_list
     {
+        ((IfAstNode)$node).then = $stmt_list.stmts;
         sst.exitScope();
     }
     | ;
@@ -124,13 +125,56 @@ while_stmt returns [AstNode node]:
     WHILE OPAREN cond CPAREN
     {
         sst.enterScope();
+        $node = new WhileAstNode(sst.currentScope.name, $cond.node, null);
     }
     decl
     stmt_list
+    {
+        ((WhileAstNode)$node).then = $stmt_list.stmts;
+    }
     ENDWHILE
     {
          sst.exitScope();
     }
+    ;
+
+cond  returns [AstNode node]: t1 = expr compop t2 = expr
+    {
+        AstNode left = $t1.node;
+        AstNode right = $t2.node;
+        $node = new ConditionOpAstNode($compop.optype, left, right);
+    };
+
+compop  returns [ConditionOpAstNode.OpType optype]:
+    GT
+        {
+            $optype = ConditionOpAstNode.OpType.GT;
+        }
+    |
+    LT
+        {
+            $optype = ConditionOpAstNode.OpType.LT;
+        }
+    |
+    EQUALS
+        {
+            $optype = ConditionOpAstNode.OpType.EQ;
+        }
+    |
+    NEQUALS
+        {
+            $optype = ConditionOpAstNode.OpType.NE;
+        }
+    |
+    GTE
+        {
+            $optype = ConditionOpAstNode.OpType.GE;
+        }
+    |
+    LTE
+        {
+            $optype = ConditionOpAstNode.OpType.LE;
+        }
     ;
 
 
@@ -195,7 +239,7 @@ assign_stmt returns [AstNode node]:
         $node = $assign_expr.node;
     }
     SEMICOLON ;
-assign_expr returns [BinaryOpAstNode node]: id ASSIGN expr
+assign_expr returns [AstNode node]: id ASSIGN expr
     {
         AstNode left = new IdentifierAstNode($id.text);
         AstNode right = $expr.node;

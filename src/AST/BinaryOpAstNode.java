@@ -10,7 +10,7 @@ public class BinaryOpAstNode extends AstNode{
     public static enum OpType {
         ADD, MINUS, MULTIPLY, DIVIDE,
         ASSIGN,
-        GT, LT, GTE, LTE, EQUALS, NEQUALS
+        GT, LT, GE, LE, EQ, NE
     }
 
     public OpType op;

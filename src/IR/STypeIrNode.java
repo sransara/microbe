@@ -20,8 +20,8 @@ public class STypeIrNode extends IrNode{
     @Override
     public String toAssembly() {
         StringBuilder a = new StringBuilder("move ");
-        a.append(op1.replace("$T", "r") + " ");
-        a.append(result.replace("$T", "r") + " ");
+        a.append(ttoreg(op1) + " ");
+        a.append(ttoreg(result) + " ");
         return a.toString();
     }
 }
