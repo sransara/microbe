@@ -1,6 +1,6 @@
 LIB_ANTLR := lib/antlr.jar
 ANTLR_SCRIPT := Microbe.g4
-PATH_SEP := :
+PATH_SEP := ;
 
 all: group compiler
 

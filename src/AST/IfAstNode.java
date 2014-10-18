@@ -47,16 +47,21 @@ public class IfAstNode extends AstNode{
         if(otherwise != null) {
             self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JUMP, otherwise.blockname));
         }
+        else if (condition != null){
+            self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JUMP, this.end_blockname));
+        }
         // START_<blockname>
         self.irNodeList.add(new LTypeIrNode(IrNode.Opcode.LABEL, this.start_blockname));
         // <code for stmt_list_1>
         for(AstNode n : then) {
             self.irNodeList.addAll(n.generateIrCode().irNodeList);
         }
-        // jmp END_<blockname>
-        self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JUMP, this.end_blockname));
+
         // <otherwise>
         if(otherwise != null) {
+            // jmp END_<blockname>
+            self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JUMP, this.end_blockname));
+
             // otherwise is also another IfAstNode with some elements set as NULL
             // In otherwsie: condition, otherwise is NULL
             // then is not NULL

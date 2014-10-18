@@ -22,9 +22,10 @@ public class SymbolScopeNode {
         this.parent = null;
     }
 
-    SymbolScopeNode(SymbolScopeTree.ScopeType scopeType, SymbolScopeNode parent) {
+    SymbolScopeNode(SymbolScopeTree.ScopeType scopeType, SymbolScopeNode parent, String name) {
         this.scopeType = scopeType;
         this.parent = parent;
+        this.name = name;
     }
 
     SymbolScopeNode(SymbolScopeTree.ScopeType scopeType, SymbolScopeNode parent, VariableType rt, String name) {

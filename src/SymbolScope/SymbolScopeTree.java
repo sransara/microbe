@@ -27,8 +27,8 @@ public class SymbolScopeTree {
     }
 
     public void enterScope() {
-        SymbolScopeNode ns = new SymbolScopeNode(ScopeType.BLOCK, currentScope);
         String name = "BLOCK_" + blockx; blockx++;
+        SymbolScopeNode ns = new SymbolScopeNode(ScopeType.BLOCK, currentScope, name);
         currentScope.children.put(name, ns);
         currentScope = ns;
     }

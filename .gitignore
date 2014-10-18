@@ -7,5 +7,7 @@ build/
 *.class
 
 *.myout
+*.t.out
+*.m.out
 *.old
 sabeysir/*
