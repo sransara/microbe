@@ -23,8 +23,8 @@ if "check_output" not in dir(subprocess):
     subprocess.check_output = fn_check_output()
 
 errors = False
-testdir = './test/'
-nonsense = 'start ' if sys.platform.startswith('win') else ''
+testdir = '.' + os.sep + 'test' + os.sep
+nonsense = 'cmd /C ' if sys.platform.startswith('win') else ''
 
 for fname in os.listdir(testdir):
     if(fname.endswith('.micro') and (len(sys.argv) == 1 or fname.startswith(sys.argv[1]))):
