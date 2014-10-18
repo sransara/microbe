@@ -32,7 +32,11 @@ submit:
 
 clean:
 	touch 'test/temp.myout'
+	touch 'test/temp.m.out'
+	touch 'test/temp.t.out'
 	rm -rf test/*.myout
+	rm -rf test/*.t.out
+	rm -rf test/*.m.out
 	rm -rf classes sabeysir
 	touch 'src/Microbe.temp'
 	rm -rf src/Microbe*
