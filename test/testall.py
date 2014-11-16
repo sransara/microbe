@@ -39,7 +39,7 @@ for fname in os.listdir(testdir):
         excommand = 'java -ea -cp lib/antlr.jar' + connector + 'classes/ Micro '+ micro + ' > ' + myout
         t1xcommand = nonsense + testdir + 'tinyR ' + myout + ' > ' + mout
         t2xcommand = nonsense + testdir + 'tinyR ' + trout + ' > ' + tout
-        dfcommand = 'diff -y ' + mout + ' ' + tout
+        dfcommand = 'diff -y -W 150 ' + mout + ' ' + tout
 
         print "Testing file:", fname
         try:
@@ -53,6 +53,7 @@ for fname in os.listdir(testdir):
             print "--- Run time error"
             exit(1)
 
+        print(dfcommand)
         os.system(dfcommand)
 
 if(errors): exit(1)
