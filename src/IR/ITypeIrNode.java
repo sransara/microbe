@@ -1,31 +1,38 @@
 package IR;
 
+import Nucleus.Operand;
+
 public class ITypeIrNode extends IrNode{
     // System Interrupt
-    String result;
+    Operand result;
 
-    public ITypeIrNode(Opcode opcode, String result) {
+    public ITypeIrNode(Opcode opcode, Operand result) {
         super(opcode);
         this.result = result;
     }
 
     @Override
     public String toString() {
-        return "; " + opcode.name() + " " + result;
+        String a = null;
+        switch(opcode) {
+            case HALT: a = "; HALT"; break;
+            default: a = "; " + opcode.name() + " " + result.reference;
+        }
+        return a;
     }
 
     @Override
-    public String toAssembly() {
-        StringBuilder a = new StringBuilder("sys ");
+    public String toTiny() {
+        String a = null;
         switch(opcode) {
-            case WRITEF: a.append("writer "); break;
-            case WRITEI: a.append("writei "); break;
-            case WRITES: a.append("writes "); break;
-            case READF: a.append("readr "); break;
-            case READI: a.append("readi "); break;
-            case READS: a.append("reads "); break;
+            case WRITEF: a = String.format("sys writer %s", operandToTiny(result)); break;
+            case WRITEI: a = String.format("sys writei %s", operandToTiny(result)); break;
+            case WRITES: a = String.format("sys writes %s", operandToTiny(result)); break;
+            case READF: a = String.format("sys readr %s", operandToTiny(result)); break;
+            case READI: a = String.format("sys readi %s", operandToTiny(result)); break;
+            case READS: a = String.format("sys reads %s", operandToTiny(result)); break;
+            case HALT: a = String.format("sys halt"); break;
         }
-        a.append(ttoreg(result));
-        return a.toString();
+        return a;
     }
 }

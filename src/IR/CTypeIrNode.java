@@ -1,36 +1,34 @@
 package IR;
 
-import SymbolScope.VariableType;
+import Nucleus.Operand;
 
 public class CTypeIrNode extends IrNode{
     // Conditionals
 
-    String op1;
-    String op2;
+    Operand op1;
+    Operand op2;
     String label;
-    VariableType type;
 
-    public CTypeIrNode(Opcode opcode, String op1, String op2, String label, VariableType type) {
+    public CTypeIrNode(Opcode opcode, Operand op1, Operand op2, String label) {
         super(opcode);
         this.op1 = op1;
         this.op2 = op2;
         this.label = label;
-        this.type = type;
     }
 
     @Override
     public String toString() {
-        return "; " + opcode.name() + " " + op1 + " " + op2 + " " + label;
+        return "; " + opcode.name() + " " + op1.reference + " " + op2.reference + " " + label;
     }
 
     @Override
-    public String toAssembly() {
+    public String toTiny() {
         StringBuilder a = new StringBuilder();
-        if(type == VariableType.INT) {
-            a.append("cmpi " + ttoreg(op1) + " " + ttoreg(op2));
+        if(op1.dataType == Operand.DataType.INT) {
+            a.append("cmpi " + operandToTiny(op1) + " " + operandToTiny(op2));
         }
-        else if (type == VariableType.FLOAT) {
-            a.append("cmpr " + ttoreg(op1) + " " + ttoreg(op2));
+        else if (op1.dataType == Operand.DataType.FLOAT) {
+            a.append("cmpr " + operandToTiny(op1) + " " + operandToTiny(op2));
         }
         a.append("\n");
 

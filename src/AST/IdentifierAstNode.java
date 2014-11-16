@@ -1,8 +1,7 @@
 package AST;
 
 import IR.IrCode;
-import IR.IrCodeState;
-import SymbolScope.Symbol;
+import SymbolScope.ScopeNode;
 
 public class IdentifierAstNode extends AstNode {
     public String id;
@@ -12,11 +11,9 @@ public class IdentifierAstNode extends AstNode {
     }
 
     @Override
-    public IrCode generateIrCode() {
+    public IrCode generateIrCode(ScopeNode scope) {
         IrCode c = new IrCode();
-        Symbol<?> symbol = IrCodeState.CURRENT_SCOPE.findSymbol(id);
-        c.type = symbol.type;
-        c.result = symbol.name;
+        c.result = scope.findSymbol(id);
         return c;
     }
 }

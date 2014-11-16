@@ -15,7 +15,7 @@ public class LTypeIrNode extends IrNode{
     }
 
     @Override
-    public String toAssembly() {
+    public String toTiny() {
         return "label " + label;
     }
 }

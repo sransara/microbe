@@ -1,6 +1,6 @@
 LIB_ANTLR := lib/antlr.jar
 ANTLR_SCRIPT := Microbe
-PATH_SEP := :
+PATH_SEP := ;
 all: parser compiler
 
 parser:
@@ -9,12 +9,12 @@ parser:
 compiler:
 	rm -rf classes
 	mkdir classes
-	javac -d classes src/SymbolScope/*.java src/AST/*.java src/IR/*.java
+	javac -d classes src/SymbolScope/*.java src/AST/*.java src/IR/*.java src/Nucleus/*.java
 	javac -cp $(LIB_ANTLR)$(PATH_SEP)classes$(PATH_SEP) -d classes src/*.java
 
 test:
 	touch 'test/temp.myout'
-	rm -rf test/*.myout
+	rm -f test/*.myout
 	python test/testall.py
 
 rsubmit:
@@ -34,11 +34,11 @@ clean:
 	touch 'test/temp.myout'
 	touch 'test/temp.m.out'
 	touch 'test/temp.t.out'
-	rm -rf test/*.myout
-	rm -rf test/*.t.out
-	rm -rf test/*.m.out
+	rm -f test/*.myout
+	rm -f test/*.t.out
+	rm -f test/*.m.out
 	rm -rf classes sabeysir
 	touch 'src/Microbe.temp'
-	rm -rf src/Microbe*
+	rm -f src/Microbe*
 
 .PHONY: all parser compiler clean test rsubmit submit

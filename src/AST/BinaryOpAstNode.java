@@ -1,10 +1,8 @@
 package AST;
 
 import IR.*;
-import SymbolScope.Symbol;
-import SymbolScope.VariableType;
-
-import java.util.List;
+import Nucleus.Operand;
+import SymbolScope.ScopeNode;
 
 public class BinaryOpAstNode extends AstNode{
     public static enum OpType {
@@ -24,28 +22,29 @@ public class BinaryOpAstNode extends AstNode{
     }
 
     @Override
-    public IrCode generateIrCode() {
+    public IrCode generateIrCode(ScopeNode scope) {
         IrCode c = null;
         switch (op) {
             case ADD:
             case MINUS:
             case MULTIPLY:
             case DIVIDE: {
-                c = generateRTypeIrCode();
+                c = generateRTypeIrCode(scope);
                 break;
             }
             case ASSIGN: {
-                c = generateSTypeIrCode();
+                c = generateSTypeIrCode(scope);
                 break;
             }
         }
         return c;
     }
 
-    private IrCode generateRTypeIrCode() {
-        IrCode lC = left.generateIrCode();
-        IrCode rC = right.generateIrCode();
+    private IrCode generateRTypeIrCode(ScopeNode scope) {
+        IrCode lC = left.generateIrCode(scope);
+        IrCode rC = right.generateIrCode(scope);
         IrCode self = new IrCode();
+        Operand.DataType resultDataType = lC.result.dataType;
 
         rC.rlvalue = IrCode.RLValue.RVALUE;
         lC.rlvalue = IrCode.RLValue.RVALUE;
@@ -54,7 +53,7 @@ public class BinaryOpAstNode extends AstNode{
         self.irNodeList.addAll(rC.irNodeList);
 
         IrNode.Opcode opcode = IrNode.Opcode.UNKNWN;
-        if(lC.type == VariableType.INT) {
+        if(resultDataType == Operand.DataType.INT) {
             switch (op) {
                 case ADD: {
                     opcode = IrNode.Opcode.ADDI;
@@ -74,7 +73,7 @@ public class BinaryOpAstNode extends AstNode{
                 }
             }
         }
-        else if(lC.type == VariableType.FLOAT) {
+        else if(resultDataType == Operand.DataType.FLOAT) {
             switch (op) {
                 case ADD: {
                     opcode = IrNode.Opcode.ADDF;
@@ -95,41 +94,39 @@ public class BinaryOpAstNode extends AstNode{
             }
         }
 
-        self.irNodeList.add(new RTypeIrNode(opcode, lC.result, rC.result, IrCodeState.newTemp()));
-        self.result = IrCodeState.getTemp();
-        self.type = lC.type;
+        self.irNodeList.add(new RTypeIrNode(opcode, lC.result, rC.result, scope.createTemp(resultDataType)));
+        self.result = scope.getCurrentTemp();
 
         return self;
     }
 
-    private IrCode generateSTypeIrCode() {
-        IrCode rC = right.generateIrCode();
-        IrCode lC = left.generateIrCode();
+    private IrCode generateSTypeIrCode(ScopeNode scope) {
+        IrCode rC = right.generateIrCode(scope);
+        IrCode lC = left.generateIrCode(scope);
+        Operand.DataType resultDataType = lC.result.dataType;
         rC.rlvalue = IrCode.RLValue.RVALUE;
         assert lC.rlvalue == IrCode.RLValue.LVALUE : "Assignment's LHS has a RVALUE";
 
         IrCode self = new IrCode();
         self.irNodeList.addAll(rC.irNodeList);
 
-        if(lC.type == VariableType.INT) {
-            if(rC.isTempResult()) {
-                self.irNodeList.add(new STypeIrNode(IrNode.Opcode.STOREI, rC.result, lC.result));
+        if(resultDataType == Operand.DataType.INT) {
+            if(rC.result.operandType == Operand.OperandType.TEMPORARY) {
+                self.irNodeList.add(new MTypeIrNode(IrNode.Opcode.STOREI, rC.result, lC.result));
             }
             else {
-                self.irNodeList.add(new STypeIrNode(IrNode.Opcode.STOREI, rC.result, IrCodeState.newTemp()));
-                self.irNodeList.add(new STypeIrNode(IrNode.Opcode.STOREI, IrCodeState.getTemp(), lC.result));
+                self.irNodeList.add(new MTypeIrNode(IrNode.Opcode.STOREI, rC.result, scope.createTemp(resultDataType)));
+                self.irNodeList.add(new MTypeIrNode(IrNode.Opcode.STOREI, scope.getCurrentTemp(), lC.result));
             }
-            self.type = lC.type;
         }
-        else if(lC.type == VariableType.FLOAT) {
-            if(rC.isTempResult()) {
-                self.irNodeList.add(new STypeIrNode(IrNode.Opcode.STOREF, rC.result, lC.result));
+        else if(resultDataType == Operand.DataType.FLOAT) {
+            if(rC.result.operandType == Operand.OperandType.TEMPORARY) {
+                self.irNodeList.add(new MTypeIrNode(IrNode.Opcode.STOREF, rC.result, lC.result));
             }
             else {
-                self.irNodeList.add(new STypeIrNode(IrNode.Opcode.STOREF, rC.result, IrCodeState.newTemp()));
-                self.irNodeList.add(new STypeIrNode(IrNode.Opcode.STOREF, IrCodeState.getTemp(), lC.result));
+                self.irNodeList.add(new MTypeIrNode(IrNode.Opcode.STOREF, rC.result, scope.createTemp(resultDataType)));
+                self.irNodeList.add(new MTypeIrNode(IrNode.Opcode.STOREF, scope.getCurrentTemp(), lC.result));
             }
-            self.type = lC.type;
         }
         return self;
     }

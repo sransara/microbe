@@ -1,18 +1,19 @@
 package SymbolScope;
 
-import java.util.Set;
+import Nucleus.Operand;
 
 public class SymbolScopeTree {
     static enum ScopeType {
         GLOBAL, BLOCK, FUNCTION
     }
 
-    public SymbolScopeNode GlobalScope = new SymbolScopeNode(ScopeType.GLOBAL);
-    public SymbolScopeNode currentScope;
-    private int blockx = 1;
+    public static ScopeNode GlobalScope;
+    public ScopeNode currentScope;
+    private int block_x = 1;
 
     public SymbolScopeTree() {
-        currentScope = GlobalScope;
+        currentScope = new ScopeNode(ScopeType.GLOBAL);
+        GlobalScope = currentScope;
     }
 
     public void exitScope() {
@@ -20,25 +21,17 @@ public class SymbolScopeTree {
     }
 
     public void enterScope(String rt, String name) {
-        VariableType returnType = VariableType.valueOf(rt);
-        SymbolScopeNode ns = new SymbolScopeNode(ScopeType.FUNCTION, currentScope, returnType, name);
+        Operand.DataType returnType = Operand.DataType.valueOf(rt);
+        ScopeNode ns = new FunctionScopeNode(currentScope, returnType, name);
         currentScope.children.put(name, ns);
         currentScope = ns;
     }
 
     public void enterScope() {
-        String name = "BLOCK_" + blockx; blockx++;
-        SymbolScopeNode ns = new SymbolScopeNode(ScopeType.BLOCK, currentScope, name);
+        String name = "BLOCK_" + block_x;
+        block_x++;
+        ScopeNode ns = new BlockScopeNode(currentScope, name);
         currentScope.children.put(name, ns);
         currentScope = ns;
-    }
-
-    public void printTree(String scopeName, SymbolScopeNode cs) {
-        System.out.println("Symbol table " + scopeName);
-        cs.printSymbols();
-        Set<String> scopeNames = cs.children.keySet();
-        for(String sn : scopeNames) {
-            printTree(sn, cs.children.get(sn));
-        }
     }
 }

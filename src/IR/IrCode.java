@@ -1,6 +1,6 @@
 package IR;
 
-import SymbolScope.VariableType;
+import Nucleus.Operand;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -12,8 +12,7 @@ public class IrCode {
 
     public RLValue rlvalue = RLValue.LVALUE;
     public List<IrNode> irNodeList = new LinkedList<IrNode>();
-    public String result;
-    public VariableType type = VariableType.VOID;
+    public Operand result;
 
     public void PrintIrCode() {
         for(IrNode n : irNodeList) {
@@ -21,13 +20,9 @@ public class IrCode {
         }
     }
 
-    public void PrintAssembly() {
+    public void PrintTiny() {
         for(IrNode n : irNodeList) {
-            System.out.println(n.toAssembly());
+            System.out.println(n.toTiny());
         }
-    }
-    
-    public boolean isTempResult() {
-      return result.startsWith("$T");
     }
 }

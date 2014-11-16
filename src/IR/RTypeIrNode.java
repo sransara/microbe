@@ -1,11 +1,13 @@
 package IR;
 
-public class RTypeIrNode extends IrNode{
-    String op1;
-    String op2;
-    String result;
+import Nucleus.Operand;
 
-    public RTypeIrNode(Opcode opcode, String op1, String op2, String result) {
+public class RTypeIrNode extends IrNode{
+    Operand op1;
+    Operand op2;
+    Operand result;
+
+    public RTypeIrNode(Opcode opcode, Operand op1, Operand op2, Operand result) {
         super(opcode);
         this.op1 = op1;
         this.op2 = op2;
@@ -14,14 +16,14 @@ public class RTypeIrNode extends IrNode{
 
     @Override
     public String toString() {
-        return "; " + opcode.name() + " " + op1 + " " + op2 + " " + result;
+        return "; " + opcode.name() + " " + op1.reference + " " + op2.reference + " " + result.reference;
     }
 
     @Override
-    public String toAssembly() {
+    public String toTiny() {
         StringBuilder a = new StringBuilder("move ");
-        a.append(ttoreg(op1) + " ");
-        a.append(ttoreg(result) + "\n");
+        a.append(operandToTiny(op1) + " ");
+        a.append(operandToTiny(result) + "\n");
 
         switch(opcode) {
             case ADDF: a.append("addr "); break;
@@ -33,8 +35,8 @@ public class RTypeIrNode extends IrNode{
             case DIVF: a.append("divr "); break;
             case DIVI: a.append("divi "); break;
         }
-        a.append(ttoreg(op2) + " ");
-        a.append(ttoreg(result));
+        a.append(operandToTiny(op2) + " ");
+        a.append(operandToTiny(result));
         return a.toString();
     }
 }

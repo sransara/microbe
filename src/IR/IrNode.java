@@ -1,6 +1,10 @@
 package IR;
 
+import Nucleus.Operand;
+
 public abstract class IrNode {
+    private static final int NUM_OF_REGS = 4;
+
     public static enum Opcode {
         ADDI, SUBI, MULTI, DIVI,
         ADDF, SUBF, MULTF, DIVF,
@@ -9,8 +13,8 @@ public abstract class IrNode {
         JUMP,
         LABEL,
         READI, READF, READS, WRITEI, WRITEF, WRITES,
-        RET,
-        UNKNWN
+        JSR, PUSH, POP, RET, LINK,
+        HALT, UNKNWN
     }
 
     public Opcode opcode;
@@ -21,9 +25,25 @@ public abstract class IrNode {
 
     public abstract String toString();
 
-    public abstract String toAssembly();
+    public abstract String toTiny();
 
-    protected String ttoreg(String temp) {
-        return temp.replace("$T", "r");
+    protected String operandToTiny(Operand operand) {
+        String c = operand.reference;
+        if(c.startsWith("$P")) {
+            int p_offset = Integer.parseInt(c.replace("$P", "")) + 1; // offset by 1 for return address
+            c = "$" + p_offset;
+        }
+        else if(c.startsWith("$R")) {
+            int r_offset = Integer.parseInt(c.replace("$R", "")) + 1; // offset by 1 for return address
+            c = "$" + r_offset;
+        }
+        if(c.startsWith("$L")) {
+            int l_offset = Integer.parseInt(c.replace("$L", ""));
+            c = "$-" + l_offset;
+        }
+        else {
+            c = c.replace("$T", "r");
+        }
+        return c;
     }
 }

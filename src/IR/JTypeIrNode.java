@@ -16,7 +16,16 @@ public class JTypeIrNode extends IrNode{
     }
 
     @Override
-    public String toAssembly() {
-        return "jmp " + label;
+    public String toTiny() {
+        String r = null;
+        switch (opcode) {
+            case JUMP:
+                r = "jmp " + label;
+                break;
+            case JSR:
+                r = "jsr " + label;
+                break;
+        }
+        return r;
     }
 }

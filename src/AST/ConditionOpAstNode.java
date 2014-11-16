@@ -1,7 +1,8 @@
 package AST;
 
 import IR.*;
-import SymbolScope.VariableType;
+import Nucleus.Operand;
+import SymbolScope.ScopeNode;
 
 public class ConditionOpAstNode extends AstNode{
     public static enum OpType {
@@ -11,7 +12,7 @@ public class ConditionOpAstNode extends AstNode{
     public OpType op;
     public AstNode right;
     public AstNode left;
-    public String jump_label;
+    public String jumpLabel;
 
     public ConditionOpAstNode(OpType op, AstNode left, AstNode right) {
         this.op = op;
@@ -20,9 +21,10 @@ public class ConditionOpAstNode extends AstNode{
     }
 
     @Override
-    public IrCode generateIrCode() {
-        IrCode lC = left.generateIrCode();
-        IrCode rC = right.generateIrCode();
+    public IrCode generateIrCode(ScopeNode scope) {
+        IrCode lC = left.generateIrCode(scope);
+        IrCode rC = right.generateIrCode(scope);
+        Operand.DataType resultDataType = lC.result.dataType;
         IrCode self = new IrCode();
 
         rC.rlvalue = IrCode.RLValue.RVALUE;
@@ -34,13 +36,11 @@ public class ConditionOpAstNode extends AstNode{
         IrNode.Opcode opcode = IrNode.Opcode.UNKNWN;
         IrNode.Opcode st_opcode = IrNode.Opcode.UNKNWN;
 
-        if(lC.type == VariableType.INT) {
-            self.type = VariableType.INT;
+        if(resultDataType == Operand.DataType.INT) {
             st_opcode = IrNode.Opcode.STOREI;
 
         }
-        else if(lC.type == VariableType.FLOAT) {
-            self.type = VariableType.FLOAT;
+        else if(resultDataType == Operand.DataType.FLOAT) {
             st_opcode = IrNode.Opcode.STOREF;
         }
 
@@ -70,15 +70,14 @@ public class ConditionOpAstNode extends AstNode{
                 break;
             }
         }
-        assert self.type != VariableType.VOID : "Type is not defined for the condition";
 
-        // Right child needs to be a temp / register
-        if(rC.isTempResult()) {
-            self.irNodeList.add(new CTypeIrNode(opcode, lC.result, rC.result, this.jump_label, self.type));
+        // Right child needs to be a temp
+        if(rC.result.operandType == Operand.OperandType.TEMPORARY) {
+            self.irNodeList.add(new CTypeIrNode(opcode, lC.result, rC.result, this.jumpLabel));
         }
         else {
-            self.irNodeList.add(new STypeIrNode(st_opcode, rC.result, IrCodeState.newTemp()));
-            self.irNodeList.add(new CTypeIrNode(opcode, lC.result, IrCodeState.getTemp(), this.jump_label, self.type));
+            self.irNodeList.add(new MTypeIrNode(st_opcode, rC.result, scope.createTemp(resultDataType)));
+            self.irNodeList.add(new CTypeIrNode(opcode, lC.result, scope.getCurrentTemp(), this.jumpLabel));
         }
         return self;
     }

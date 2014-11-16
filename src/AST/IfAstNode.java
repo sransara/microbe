@@ -1,34 +1,31 @@
 package AST;
 
 import IR.*;
-
-import java.util.List;
+import SymbolScope.ScopeNode;
 
 public class IfAstNode extends AstNode{
     String blockname;
-    private String end_blockname;
-    private String start_blockname;
+    private String endBlockname;
+    private String startBlockname;
     public AstNode condition;
-    public List<AstNode> then;
     public IfAstNode otherwise;
 
-    public IfAstNode(String blockname, AstNode condition, List<AstNode> then, AstNode otherwise) {
+    public IfAstNode(String blockname, AstNode condition, AstNode otherwise) {
         this.blockname = blockname;
-        this.end_blockname = "END_" + blockname;
-        this.start_blockname = "START_" + blockname;
+        this.endBlockname = "END_" + blockname;
+        this.startBlockname = "START_" + blockname;
         this.condition = condition;
-        this.then = then;
         this.otherwise = (IfAstNode) otherwise;
     }
 
     @Override
-    public IrCode generateIrCode() {
+    public IrCode generateIrCode(ScopeNode scope) {
         IrCode self = new IrCode();
         /* ---- Need to generate this
-        <blockname>:
+        START_<blockname>:
             <code for bool_expr_1>
             j<!op> ELSE_1
-        START_<blockname>:
+        <blockname>:
             <code for stmt_list_1>
             jmp END_<blockname>
         <otherwise_blockname>:
@@ -36,39 +33,38 @@ public class IfAstNode extends AstNode{
         END_<blockname>:
         ------ alright then let's do it --- */
 
-        // <blockname>
-        self.irNodeList.add(new LTypeIrNode(IrNode.Opcode.LABEL, this.blockname));
+        // START_<blockname>
+        self.irNodeList.add(new LTypeIrNode(IrNode.Opcode.LABEL, this.startBlockname));
         //  <code for bool_expr_1>
         if(condition != null) {
-            ((ConditionOpAstNode)condition).jump_label = this.start_blockname;
-            self.irNodeList.addAll(condition.generateIrCode().irNodeList);
+            ((ConditionOpAstNode)condition).jumpLabel = this.blockname;
+            self.irNodeList.addAll(condition.generateIrCode(scope).irNodeList);
         }
         // j<!op> ELSE_1
         if(otherwise != null) {
             self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JUMP, otherwise.blockname));
         }
         else if (condition != null){
-            self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JUMP, this.end_blockname));
+            self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JUMP, this.endBlockname));
         }
-        // START_<blockname>
-        self.irNodeList.add(new LTypeIrNode(IrNode.Opcode.LABEL, this.start_blockname));
+        // <blockname> added with scope generated IR
         // <code for stmt_list_1>
-        for(AstNode n : then) {
-            self.irNodeList.addAll(n.generateIrCode().irNodeList);
-        }
+        ScopeNode cscope = scope.children.get(this.blockname);
+        cscope.generateIrCode();
+        self.irNodeList.addAll(cscope.irCode.irNodeList);
 
         // <otherwise>
         if(otherwise != null) {
             // jmp END_<blockname>
-            self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JUMP, this.end_blockname));
+            self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JUMP, this.endBlockname));
 
             // otherwise is also another IfAstNode with some elements set as NULL
             // In otherwsie: condition, otherwise is NULL
             // then is not NULL
-            self.irNodeList.addAll(otherwise.generateIrCode().irNodeList);
+            self.irNodeList.addAll(otherwise.generateIrCode(scope).irNodeList);
         }
         // END_<blockname>
-        self.irNodeList.add(new LTypeIrNode(IrNode.Opcode.LABEL, this.end_blockname));
+        self.irNodeList.add(new LTypeIrNode(IrNode.Opcode.LABEL, this.endBlockname));
         return self;
     }
 }

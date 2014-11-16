@@ -1,27 +1,58 @@
 package IR;
 
+import Nucleus.Operand;
+
 public class STypeIrNode extends IrNode{
-    // STOREI, STOREF
+    // the stack stuff
+    public Operand operand;
+    public int frameSize;
 
-    String op1;
-    String result;
-
-    public STypeIrNode(Opcode opcode, String op1, String result) {
+    public STypeIrNode(Opcode opcode, Operand operand, int frameSize) {
         super(opcode);
-        this.op1 = op1;
-        this.result = result;
+        this.operand = operand;
+        this.frameSize = frameSize;
     }
 
     @Override
     public String toString() {
-        return "; " + opcode.name() + " " + op1 + " " + result;
+        String c = null;
+        switch (opcode) {
+            case LINK:
+                c = "; LINK";
+                break;
+            case RET:
+                c = "; RET";
+                break;
+            case PUSH:
+            case POP:// PUSH POP
+                c = "; " + opcode.name() + " ";
+                if(operand != null) {
+                    c += operand.reference;
+                }
+                break;
+        }
+        return c;
     }
 
     @Override
-    public String toAssembly() {
-        StringBuilder a = new StringBuilder("move ");
-        a.append(ttoreg(op1) + " ");
-        a.append(ttoreg(result) + " ");
-        return a.toString();
+    public String toTiny() {
+        String c = null;
+        switch (opcode){
+            case LINK:
+                c = "link " + frameSize;
+                break;
+            case RET:
+                c  = "unlnk \n";
+                c += "ret";
+                break;
+            case PUSH:
+            case POP:// PUSH POP
+                c = opcode.name().toLowerCase() + " ";
+                if(operand != null) {
+                    c += operandToTiny(operand);
+                }
+                break;
+         }
+        return c;
     }
 }

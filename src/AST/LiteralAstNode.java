@@ -1,23 +1,22 @@
 package AST;
 import IR.IrCode;
-import IR.IrCodeState;
-import SymbolScope.Symbol;
-import SymbolScope.VariableType;
+import Nucleus.Literal;
+import Nucleus.Operand;
+import SymbolScope.ScopeNode;
 
 public class LiteralAstNode extends AstNode {
-    String literal;
-    VariableType type;
+    Object literal;
+    Operand.DataType type;
 
-    public LiteralAstNode(String l, VariableType v) {
+    public LiteralAstNode(Operand.DataType t, Object l) {
         this.literal = l;
-        this.type = v;
+        this.type = t;
     }
 
     @Override
-    public IrCode generateIrCode() {
+    public IrCode generateIrCode(ScopeNode scope) {
         IrCode c = new IrCode();
-        c.type = type;
-        c.result = literal;
+        c.result = new Literal(type, literal);
         return c;
     }
 }

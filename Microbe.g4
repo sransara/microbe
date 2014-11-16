@@ -2,6 +2,7 @@ grammar Microbe;
 
 @header {
     import java.util.LinkedList;
+    import Nucleus.*;
     import SymbolScope.*;
     import AST.*;
 }
@@ -22,7 +23,7 @@ decl: string_decl decl | var_decl decl | ;
 /* Global String Declaration */
 string_decl: STRING id ASSIGN str SEMICOLON
     {
-        sst.currentScope.addVariable($STRING.text, $id.text, $str.text);
+        sst.currentScope.addString($id.text, $str.text);
     };
 
 str: STRINGLITERAL ;
@@ -62,7 +63,7 @@ param_decl_list: param_decl param_decl_tail | ;
 
 param_decl: var_type id
     {
-        sst.currentScope.addVariable($var_type.text, $id.text);
+        ((FunctionScopeNode)sst.currentScope).addParameter($var_type.text, $id.text);
     };
 
 param_decl_tail: COMMA param_decl param_decl_tail | ;
@@ -92,12 +93,12 @@ if_stmt returns [AstNode node]:
     IF OPAREN cond CPAREN
     {
         sst.enterScope();
-        $node = new IfAstNode(sst.currentScope.name, $cond.node, null, null);
+        $node = new IfAstNode(sst.currentScope.name, $cond.node, null);
     }
     decl
     stmt_list
     {
-        ((IfAstNode)$node).then = $stmt_list.stmts;
+        sst.currentScope.statements = $stmt_list.stmts;
         sst.exitScope();
     }
     else_part
@@ -111,12 +112,12 @@ else_part returns [IfAstNode node]:
     ELSE
     {
         sst.enterScope();
-        $node = new IfAstNode(sst.currentScope.name, null, null, null);
+        $node = new IfAstNode(sst.currentScope.name, null, null);
     }
     decl
     stmt_list
     {
-        ((IfAstNode)$node).then = $stmt_list.stmts;
+        sst.currentScope.statements = $stmt_list.stmts;
         sst.exitScope();
     }
     | ;
@@ -125,12 +126,12 @@ while_stmt returns [AstNode node]:
     WHILE OPAREN cond CPAREN
     {
         sst.enterScope();
-        $node = new WhileAstNode(sst.currentScope.name, $cond.node, null);
+        $node = new WhileAstNode(sst.currentScope.name, $cond.node);
     }
     decl
     stmt_list
     {
-        ((WhileAstNode)$node).then = $stmt_list.stmts;
+        sst.currentScope.statements = $stmt_list.stmts;
     }
     ENDWHILE
     {
@@ -255,7 +256,7 @@ write_stmt returns [AstNode node]: WRITE OPAREN id_list CPAREN SEMICOLON
     };
 return_stmt returns [AstNode node]: RETURN expr SEMICOLON
     {
-        $node = $expr.node;
+        $node = new CallAstNode(CallAstNode.OpType.RET, $expr.node);;
     };
 
 /* Expressions */
@@ -317,11 +318,32 @@ postfix_expr returns [AstNode node]:
         }
     ;
 
-call_expr returns [AstNode node]:  id OPAREN expr_list CPAREN;
+call_expr returns [AstNode node]:  id OPAREN expr_list CPAREN
+    {
+        $node = new CallAstNode(CallAstNode.OpType.CALL, $id.text, $expr_list.nodes);
+    };
 
-expr_list: expr expr_list_tail | ;
+expr_list returns [LinkedList<AstNode> nodes]:
+    expr expr_list_tail
+        {
+            $nodes = $expr_list_tail.nodes;
+            $nodes.add(0, $expr.node);
+        }
+    |
+        {
+            $nodes = new LinkedList<AstNode>();
+        };
 
-expr_list_tail: COMMA expr expr_list_tail | ;
+expr_list_tail returns [LinkedList<AstNode> nodes]:
+    COMMA expr t = expr_list_tail
+        {
+            $nodes = $t.nodes;
+            $nodes.add(0, $expr.node);
+        }
+    |
+        {
+              $nodes = new LinkedList<AstNode>();
+        };
 
 primary returns [AstNode node]:
     OPAREN expr CPAREN
@@ -336,12 +358,12 @@ primary returns [AstNode node]:
     |
     INTLITERAL
         {
-            $node = new LiteralAstNode($INTLITERAL.text, VariableType.FLOAT);
+            $node = new LiteralAstNode(Operand.DataType.INT, $INTLITERAL.text);
         }
     |
     FLOATLITERAL
         {
-            $node = new LiteralAstNode($FLOATLITERAL.text, VariableType.FLOAT);
+            $node = new LiteralAstNode(Operand.DataType.FLOAT, $FLOATLITERAL.text);
         }
     ;
 
