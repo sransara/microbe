@@ -11,7 +11,7 @@ import java.util.List;
 
 public class BlockScopeNode extends ScopeNode {
     BlockScopeNode(ScopeNode parent, String name) {
-        super(SymbolScopeTree.ScopeType.BLOCK);
+        this.scopeType = SymbolScopeTree.ScopeType.BLOCK;
         this.parent = parent;
         this.name = name;
     }
@@ -46,7 +46,7 @@ public class BlockScopeNode extends ScopeNode {
         for (String id : ids) {
             String idf = String.format("%s.%s", this.name, id);
             String ref = ((FunctionScopeNode)f).addVariable(t, idf, null);
-            addSymbol(t, id, ref, null);
+            addSymbol(t, id, ref, null, Operand.OperandType.SYMBOL);
         }
     }
 
@@ -55,16 +55,44 @@ public class BlockScopeNode extends ScopeNode {
         String ref = String.format("%s.%s", this.name, id);
         Operand.DataType t = Operand.DataType.STRING;
         // reference and reference are the same for global variables
-        addSymbol(t, id, ref, value);
-        super.addString(ref, value);
+        addSymbol(t, id, ref, value, Operand.OperandType.SYMBOL);
+
+        // add it to the global scope to put it in data segment
+        ScopeNode g = this;
+        while(g.parent != null) {
+            g = g.parent;
+        }
+        // reference and reference are the same for global variables
+        ((GlobalScopeNode)g).addString(ref, value);
         return ref;
+    }
+
+    public FunctionScopeNode getParentFunction() {
+        ScopeNode f = this;
+        if(f.parent == null) {
+            return null;
+        }
+        while(f.scopeType != SymbolScopeTree.ScopeType.FUNCTION) {
+            f = f.parent;
+        }
+        return (FunctionScopeNode)f;
     }
 
     public void generateIrCode() {
         irCode = new IrCode();
-        irCode.irNodeList.add(new LTypeIrNode(IrNode.Opcode.LABEL, name));
+        irCode.irNodeList.add(new LTypeIrNode(IrNode.Opcode.LABEL, getParentFunction(),name));
         for(AstNode n : statements) {
             irCode.irNodeList.addAll(n.generateIrCode(this).irNodeList);
         }
+    }
+
+    @Override
+    public void printIrCode() {
+        irCode.printIrCode();
+    }
+
+    @Override
+    public void printTinyCode() {
+        irCode.printTinyCode();
     }
 }

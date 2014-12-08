@@ -2,7 +2,9 @@ package Nucleus;
 
 public class Operand {
     public static enum OperandType {
-        SYMBOL, TEMPORARY, LITERAL
+        GLOBAL_SYMBOL, SYMBOL,
+        TEMPORARY, SPILLED_TEMPORARY,
+        LITERAL
     }
 
     public static enum DataType {
@@ -16,5 +18,14 @@ public class Operand {
 
     public String toString() {
         return reference;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return ((Operand)o).reference.equals(reference);
+    }
+
+    public boolean isRegisterable() {
+        return operandType != Operand.OperandType.LITERAL && dataType != Operand.DataType.STRING;
     }
 }

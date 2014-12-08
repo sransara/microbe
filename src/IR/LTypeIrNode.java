@@ -1,11 +1,14 @@
 package IR;
 
+import SymbolScope.FunctionScopeNode;
+
+import java.util.Collections;
+
 public class LTypeIrNode extends IrNode{
     // It's just a label
-    String label;
 
-    public LTypeIrNode(Opcode opcode, String label) {
-        super(opcode);
+    public LTypeIrNode(Opcode opcode, FunctionScopeNode scope, String label) {
+        super(opcode, scope);
         this.label = label;
     }
 
@@ -16,6 +19,13 @@ public class LTypeIrNode extends IrNode{
 
     @Override
     public String toTiny() {
-        return "label " + label;
+        if (!isStarter()) {
+            registers = prevs.get(0).registers;
+        }
+        if (isEnder()) {
+            restoreRegisteredVariables();
+        }
+        tinyCode.append("label " + label + "\n");
+        return tinyCode.toString();
     }
 }

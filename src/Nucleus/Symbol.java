@@ -1,15 +1,11 @@
 package Nucleus;
 
 public class Symbol extends Operand {
-    public Symbol(DataType t, String n) {
-        dataType = t;
-        reference = n;
-    }
-
-    public Symbol(DataType t, String n, Object v) {
+    public Symbol(DataType t, String n, Object v, OperandType o) {
         dataType = t;
         reference = n;
         value = v;
+        operandType = o;
     }
 
     @Override

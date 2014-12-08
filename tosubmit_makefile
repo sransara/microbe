@@ -1,6 +1,6 @@
 LIB_ANTLR := lib/antlr.jar
 ANTLR_SCRIPT := Microbe.g4
-PATH_SEP := :
+PATH_SEP := ;
 
 all: group compiler
 
@@ -18,7 +18,9 @@ compiler:
 
 test:
 	touch test/temp.myout
+	touch test/temp.out
 	rm -rf test/*.myout
+	rm -rf test/*.out
 	python test/testall.py
 
 clean:

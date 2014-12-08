@@ -16,7 +16,7 @@ public class LiteralAstNode extends AstNode {
     @Override
     public IrCode generateIrCode(ScopeNode scope) {
         IrCode c = new IrCode();
-        c.result = new Literal(type, literal);
+        c.result = new Literal(type, literal, Operand.OperandType.LITERAL);
         return c;
     }
 }

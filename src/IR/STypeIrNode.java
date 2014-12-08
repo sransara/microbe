@@ -1,16 +1,25 @@
 package IR;
 
 import Nucleus.Operand;
+import Nucleus.Register;
+import SymbolScope.FunctionScopeNode;
+
+import java.util.Collections;
 
 public class STypeIrNode extends IrNode{
     // the stack stuff
     public Operand operand;
-    public int frameSize;
 
-    public STypeIrNode(Opcode opcode, Operand operand, int frameSize) {
-        super(opcode);
+    public STypeIrNode(Opcode opcode, FunctionScopeNode scope, Operand operand) {
+        super(opcode, scope);
         this.operand = operand;
-        this.frameSize = frameSize;
+
+        if (opcode == Opcode.PUSH) {
+            initGen(operand);
+        }
+        else if (opcode == Opcode.POP) {
+            initKill(operand);
+        }
     }
 
     @Override
@@ -36,23 +45,43 @@ public class STypeIrNode extends IrNode{
 
     @Override
     public String toTiny() {
+        if (!isStarter()) {
+            registers = prevs.get(0).registers;
+        }
+
         String c = null;
-        switch (opcode){
+        switch (opcode) {
             case LINK:
-                c = "link " + frameSize;
+                c = "link " + functionScope.size;
                 break;
             case RET:
-                c  = "unlnk \n";
+                c = "unlnk \n";
                 c += "ret";
                 break;
             case PUSH:
-            case POP:// PUSH POP
-                c = opcode.name().toLowerCase() + " ";
-                if(operand != null) {
-                    c += operandToTiny(operand);
+                if (operand != null) {
+                    String rop = ensureRegister(operand);
+                    dropDeadRegisters(null, rop);
+                    String opRef = rop == null ? operand.reference : rop.toString();
+                    c = "push " + opRef;
+                } else {
+                    c = "push";
                 }
                 break;
-         }
-        return c;
+            case POP:// PUSH POP
+                if (operand != null) {
+                    String rResult = allocateRegister(operand);
+                    dirtRegister(rResult);
+                    c = "pop " + rResult;
+                } else {
+                    c = "pop";
+                }
+                break;
+        }
+        if (isEnder()) {
+            restoreRegisteredVariables();
+        }
+        tinyCode.append(c + "\n");
+        return tinyCode.toString();
     }
 }

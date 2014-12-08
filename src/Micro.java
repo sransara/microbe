@@ -1,9 +1,11 @@
 /**
  * Created by Sam Abeysiriwardane
  */
-import SymbolScope.ScopeNode;
+
 import SymbolScope.SymbolScopeTree;
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 import java.io.IOException;
@@ -31,32 +33,12 @@ public class Micro {
     }
 
     private static void printIrCode(SymbolScopeTree sst) {
-        // main
         SymbolScopeTree.GlobalScope.generateIrCode();
-        SymbolScopeTree.GlobalScope.irCode.PrintIrCode();
-
-        // rest of them
-        Set<String> keys = SymbolScopeTree.GlobalScope.children.keySet();
-        for(String key: keys) {
-            SymbolScopeTree.GlobalScope.children.get(key).generateIrCode();
-            SymbolScopeTree.GlobalScope.children.get(key).irCode.PrintIrCode();
-        }
+        SymbolScopeTree.GlobalScope.printIrCode();
     }
 
     private static void printTinyCode(SymbolScopeTree sst) {
-        Set<String> symbolNames = SymbolScopeTree.GlobalScope.symbolTable.keySet();
-        for (String symbolName : symbolNames) {
-            System.out.println(SymbolScopeTree.GlobalScope.symbolTable.get(symbolName));
-        }
-        SymbolScopeTree.GlobalScope.irCode.PrintTiny();
-        // end global scope code
-
-        // rest of them
-        Set<String> keys = SymbolScopeTree.GlobalScope.children.keySet();
-        for(String key: keys) {
-            SymbolScopeTree.GlobalScope.children.get(key).irCode.PrintTiny();
-        }
-        System.out.println("end");
+        SymbolScopeTree.GlobalScope.printTinyCode();
     }
 
     private static MicrobeParser parseSource(ANTLRInputStream input) {

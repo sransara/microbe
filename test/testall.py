@@ -29,6 +29,7 @@ nonsense = 'cmd /C ' if sys.platform.startswith('win') else ''
 for fname in os.listdir(testdir):
     if(fname.endswith('.micro') and (len(sys.argv) == 1 or fname.startswith(sys.argv[1]))):
         micro = testdir + fname
+        ouout = testdir + fname.replace('.micro', '.out')
         myout = testdir + fname.replace('.micro', '.myout')
         trout = testdir + fname.replace('.micro', '.out')
         mout = testdir + fname.replace('.micro', '.m.myout')
@@ -36,13 +37,16 @@ for fname in os.listdir(testdir):
 
         connector = ";"
         if os.name == "posix": connector = ":"
+        oucommand = 'java -jar '+ testdir +'final.jar ' + micro + ' > ' + ouout
         excommand = 'java -ea -cp lib/antlr.jar' + connector + 'classes/ Micro '+ micro + ' > ' + myout
-        t1xcommand = nonsense + testdir + 'tinyR ' + myout + ' > ' + mout
-        t2xcommand = nonsense + testdir + 'tinyR ' + trout + ' > ' + tout
+        t1xcommand = nonsense + testdir + 'tinyR ' + myout + ' nostats > ' + mout
+        t2xcommand = nonsense + testdir + 'tinyR ' + trout + ' nostats > ' + tout
         dfcommand = 'diff -y -W 150 ' + mout + ' ' + tout
 
         print "Testing file:", fname
         try:
+            print(oucommand)
+            subprocess.check_output(oucommand, shell=True);
             print(excommand)
             subprocess.check_output(excommand, shell=True);
             print(t1xcommand)
@@ -53,8 +57,15 @@ for fname in os.listdir(testdir):
             print "--- Run time error"
             exit(1)
 
-        print(dfcommand)
-        os.system(dfcommand)
+        try:
+            print(dfcommand)
+            subprocess.check_output(dfcommand, shell=True);
+            print "--- PASSED TEST"
+        except:
+            print "--- FAILED TEST"
+            os.system(dfcommand)
+            print ""
+            exit(1)
 
 if(errors): exit(1)
 

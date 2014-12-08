@@ -7,7 +7,6 @@ import SymbolScope.FunctionScopeNode;
 import SymbolScope.ScopeNode;
 import SymbolScope.SymbolScopeTree;
 
-import javax.xml.crypto.Data;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,33 +43,35 @@ public class CallAstNode extends AstNode{
 
     private IrCode generateRetIrCode(ScopeNode scope) {
         IrCode self = new IrCode();
+        FunctionScopeNode fscope = scope.getParentFunction();
         IrCode r = returnExpr.generateIrCode(scope);
         self.irNodeList.addAll(r.irNodeList);
         Operand.DataType resultDataType = r.result.dataType;
         String rref = "$R" + scope.getParentFunction().parameter_x;
-        Symbol dr = new Symbol(resultDataType, rref, null);
+        Symbol dr = new Symbol(resultDataType, rref, null, Operand.OperandType.SYMBOL);
         if(r.result.operandType == Operand.OperandType.TEMPORARY) {
             if (resultDataType == Operand.DataType.INT) {
-                self.irNodeList.add(new MTypeIrNode(IrNode.Opcode.STOREI, r.result, dr));
+                self.irNodeList.add(new MTypeIrNode(IrNode.Opcode.STOREI, fscope, r.result, dr));
             } else if (resultDataType == Operand.DataType.FLOAT) {
-                self.irNodeList.add(new MTypeIrNode(IrNode.Opcode.STOREF, r.result, dr));
+                self.irNodeList.add(new MTypeIrNode(IrNode.Opcode.STOREF, fscope, r.result, dr));
             }
         }
         else {
             if (resultDataType == Operand.DataType.INT) {
-                self.irNodeList.add(new MTypeIrNode(IrNode.Opcode.STOREI, r.result, scope.createTemp(resultDataType)));
-                self.irNodeList.add(new MTypeIrNode(IrNode.Opcode.STOREI, scope.getCurrentTemp(), dr));
+                self.irNodeList.add(new MTypeIrNode(IrNode.Opcode.STOREI, fscope, r.result, scope.createTemp(resultDataType)));
+                self.irNodeList.add(new MTypeIrNode(IrNode.Opcode.STOREI, fscope, scope.getCurrentTemp(), dr));
             } else if (resultDataType == Operand.DataType.FLOAT) {
-                self.irNodeList.add(new MTypeIrNode(IrNode.Opcode.STOREF, r.result, scope.createTemp(resultDataType)));
-                self.irNodeList.add(new MTypeIrNode(IrNode.Opcode.STOREF, scope.getCurrentTemp(), dr));
+                self.irNodeList.add(new MTypeIrNode(IrNode.Opcode.STOREF, fscope, r.result, scope.createTemp(resultDataType)));
+                self.irNodeList.add(new MTypeIrNode(IrNode.Opcode.STOREF, fscope, scope.getCurrentTemp(), dr));
             }
         }
-        self.irNodeList.add(new STypeIrNode(IrNode.Opcode.RET, null, 0));
+        self.irNodeList.add(new STypeIrNode(IrNode.Opcode.RET, fscope, null));
         return self;
     }
 
     private IrCode generateCallIrCode(ScopeNode scope) {
         IrCode self = new IrCode();
+        FunctionScopeNode fscope = scope.getParentFunction();
         // saved registers
         // result
         // arg n
@@ -78,7 +79,7 @@ public class CallAstNode extends AstNode{
         // arg 1
         // ret address
         // prev stack pointer <- bp
-        self.irNodeList.add(new STypeIrNode(IrNode.Opcode.PUSH, null, 0));
+        self.irNodeList.add(new STypeIrNode(IrNode.Opcode.PUSH, fscope, null));
         List<Operand> tempResults = new LinkedList<Operand>();
 
         Iterator<AstNode> iexprs = exprs.descendingIterator();
@@ -91,24 +92,25 @@ public class CallAstNode extends AstNode{
         }
 
         for(Operand t : tempResults) {
-            self.irNodeList.add(new STypeIrNode(IrNode.Opcode.PUSH, t, 0));
+            self.irNodeList.add(new STypeIrNode(IrNode.Opcode.PUSH, fscope, t));
         }
-        self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JSR, function));
+        self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JSR, fscope, function));
         for(Operand t : tempResults) {
-            self.irNodeList.add(new STypeIrNode(IrNode.Opcode.POP, null, 0));
+            self.irNodeList.add(new STypeIrNode(IrNode.Opcode.POP, fscope, null));
         }
 
         FunctionScopeNode f = (FunctionScopeNode)SymbolScopeTree.GlobalScope.children.get(function);
         Operand.DataType returnType = f.returnType;
 
         if(returnType != Operand.DataType.VOID){
-            self.irNodeList.add(new STypeIrNode(IrNode.Opcode.POP, scope.createTemp(returnType), 0));
+            self.irNodeList.add(new STypeIrNode(IrNode.Opcode.POP, fscope, scope.createTemp(returnType)));
             self.result = scope.getCurrentTemp();
         }
         else {
-            self.irNodeList.add(new STypeIrNode(IrNode.Opcode.POP, null, 0));
+            self.irNodeList.add(new STypeIrNode(IrNode.Opcode.POP, fscope, null));
             self.result = null;
         }
+
         return self;
     }
 }

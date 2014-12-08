@@ -1,7 +1,11 @@
 package AST;
 
-import IR.*;
+import IR.CTypeIrNode;
+import IR.IrCode;
+import IR.IrNode;
+import IR.MTypeIrNode;
 import Nucleus.Operand;
+import SymbolScope.FunctionScopeNode;
 import SymbolScope.ScopeNode;
 
 public class ConditionOpAstNode extends AstNode{
@@ -34,14 +38,14 @@ public class ConditionOpAstNode extends AstNode{
         self.irNodeList.addAll(rC.irNodeList);
 
         IrNode.Opcode opcode = IrNode.Opcode.UNKNWN;
-        IrNode.Opcode st_opcode = IrNode.Opcode.UNKNWN;
+        IrNode.Opcode storeOpcode = IrNode.Opcode.UNKNWN;
 
         if(resultDataType == Operand.DataType.INT) {
-            st_opcode = IrNode.Opcode.STOREI;
+            storeOpcode = IrNode.Opcode.STOREI;
 
         }
         else if(resultDataType == Operand.DataType.FLOAT) {
-            st_opcode = IrNode.Opcode.STOREF;
+            storeOpcode = IrNode.Opcode.STOREF;
         }
 
         switch (op) {
@@ -70,14 +74,14 @@ public class ConditionOpAstNode extends AstNode{
                 break;
             }
         }
-
+        FunctionScopeNode fscope = scope.getParentFunction();
         // Right child needs to be a temp
         if(rC.result.operandType == Operand.OperandType.TEMPORARY) {
-            self.irNodeList.add(new CTypeIrNode(opcode, lC.result, rC.result, this.jumpLabel));
+            self.irNodeList.add(new CTypeIrNode(opcode, fscope, lC.result, rC.result, this.jumpLabel));
         }
         else {
-            self.irNodeList.add(new MTypeIrNode(st_opcode, rC.result, scope.createTemp(resultDataType)));
-            self.irNodeList.add(new CTypeIrNode(opcode, lC.result, scope.getCurrentTemp(), this.jumpLabel));
+            self.irNodeList.add(new MTypeIrNode(storeOpcode, fscope, rC.result, scope.createTemp(resultDataType)));
+            self.irNodeList.add(new CTypeIrNode(opcode, fscope, lC.result, scope.getCurrentTemp(), this.jumpLabel));
         }
         return self;
     }

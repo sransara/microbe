@@ -1,6 +1,10 @@
 package AST;
 
-import IR.*;
+import IR.IrCode;
+import IR.IrNode;
+import IR.JTypeIrNode;
+import IR.LTypeIrNode;
+import SymbolScope.FunctionScopeNode;
 import SymbolScope.ScopeNode;
 
 public class WhileAstNode extends AstNode{
@@ -19,6 +23,7 @@ public class WhileAstNode extends AstNode{
     @Override
     public IrCode generateIrCode(ScopeNode scope) {
         IrCode self = new IrCode();
+        FunctionScopeNode fscope = scope.getParentFunction();
         /* ---- Need to generate this
         START_<blockname>:
             <bool expr>, <blockname>
@@ -30,12 +35,12 @@ public class WhileAstNode extends AstNode{
         ------ alright then let's do it --- */
 
         // START_<blockname>
-        self.irNodeList.add(new LTypeIrNode(IrNode.Opcode.LABEL, this.startBlockname));
+        self.irNodeList.add(new LTypeIrNode(IrNode.Opcode.LABEL, fscope, this.startBlockname));
         //  <code for bool_expr_1>
         ((ConditionOpAstNode)condition).jumpLabel = this.blockname;
         self.irNodeList.addAll(condition.generateIrCode(scope).irNodeList);
         // j<!op> ELSE_1
-        self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JUMP, this.endBlockname));
+        self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JUMP, fscope, this.endBlockname));
         // <blockname> added with scope gerenated IR
         // <code for stmt_list_1>
         ScopeNode cscope = scope.children.get(this.blockname);
@@ -43,9 +48,9 @@ public class WhileAstNode extends AstNode{
         self.irNodeList.addAll(cscope.irCode.irNodeList);
 
         // jmp START_<blockname>
-        self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JUMP, this.startBlockname));
+        self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JUMP, fscope, this.startBlockname));
         // END_<blockname>
-        self.irNodeList.add(new LTypeIrNode(IrNode.Opcode.LABEL, this.endBlockname));
+        self.irNodeList.add(new LTypeIrNode(IrNode.Opcode.LABEL, fscope, this.endBlockname));
         return self;
     }
 }

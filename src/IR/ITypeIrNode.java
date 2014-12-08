@@ -1,14 +1,26 @@
 package IR;
 
 import Nucleus.Operand;
+import Nucleus.Register;
+import SymbolScope.FunctionScopeNode;
+
+import java.util.Collections;
+
+import static java.lang.String.format;
 
 public class ITypeIrNode extends IrNode{
     // System Interrupt
     Operand result;
 
-    public ITypeIrNode(Opcode opcode, Operand result) {
-        super(opcode);
-        this.result = result;
+    public ITypeIrNode(Opcode opcode, FunctionScopeNode scope, Operand op1) {
+        super(opcode, scope);
+        this.result = op1;
+        if (opcode == Opcode.WRITEF || opcode == Opcode.WRITEI) {
+            initGen(op1);
+        }
+        else if(opcode == Opcode.READI || opcode == Opcode.READF) {
+            initKill(op1);
+        }
     }
 
     @Override
@@ -23,16 +35,55 @@ public class ITypeIrNode extends IrNode{
 
     @Override
     public String toTiny() {
-        String a = null;
-        switch(opcode) {
-            case WRITEF: a = String.format("sys writer %s", operandToTiny(result)); break;
-            case WRITEI: a = String.format("sys writei %s", operandToTiny(result)); break;
-            case WRITES: a = String.format("sys writes %s", operandToTiny(result)); break;
-            case READF: a = String.format("sys readr %s", operandToTiny(result)); break;
-            case READI: a = String.format("sys readi %s", operandToTiny(result)); break;
-            case READS: a = String.format("sys reads %s", operandToTiny(result)); break;
-            case HALT: a = String.format("sys halt"); break;
+        if (!isStarter()) {
+            registers = prevs.get(0).registers;
         }
-        return a;
+        String rop;
+        String opRef = null;
+        if (result != null) {
+            opRef = result.reference;
+        }
+
+        String a = null;
+        switch (opcode) {
+            case WRITEF:
+                rop = ensureRegister(result);
+                dropDeadRegisters(null, rop);
+                opRef = rop == null ? result.reference : rop;
+                a = format("sys writer %s", opRef);
+                break;
+            case WRITEI:
+                rop = ensureRegister(result);
+                dropDeadRegisters(null, rop);
+                opRef = rop == null ? result.reference : rop;
+                a = format("sys writei %s", opRef);
+                break;
+            case WRITES:
+                a = format("sys writes %s", opRef);
+                break;
+            case READF:
+                rop = allocateRegister(result);
+                dirtRegister(rop);
+                a = format("sys readr %s", rop);
+                break;
+            case READI:
+                rop = allocateRegister(result);
+                dirtRegister(rop);
+                a = format("sys readi %s", rop);
+                break;
+            case READS:
+                a = format("sys reads %s", opRef);
+                break;
+            case HALT:
+                a = format("sys halt");
+                break;
+        }
+        tinyCode.append(a + "\n");
+
+        if (isEnder()) {
+            restoreRegisteredVariables();
+        }
+
+        return tinyCode.toString();
     }
 }

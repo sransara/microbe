@@ -12,7 +12,7 @@ public class SymbolScopeTree {
     private int block_x = 1;
 
     public SymbolScopeTree() {
-        currentScope = new ScopeNode(ScopeType.GLOBAL);
+        currentScope = new GlobalScopeNode(ScopeType.GLOBAL);
         GlobalScope = currentScope;
     }
 

@@ -1,6 +1,10 @@
 package AST;
 
-import IR.*;
+import IR.IrCode;
+import IR.IrNode;
+import IR.JTypeIrNode;
+import IR.LTypeIrNode;
+import SymbolScope.FunctionScopeNode;
 import SymbolScope.ScopeNode;
 
 public class IfAstNode extends AstNode{
@@ -21,6 +25,7 @@ public class IfAstNode extends AstNode{
     @Override
     public IrCode generateIrCode(ScopeNode scope) {
         IrCode self = new IrCode();
+        FunctionScopeNode fscope = scope.getParentFunction();
         /* ---- Need to generate this
         START_<blockname>:
             <code for bool_expr_1>
@@ -34,7 +39,7 @@ public class IfAstNode extends AstNode{
         ------ alright then let's do it --- */
 
         // START_<blockname>
-        self.irNodeList.add(new LTypeIrNode(IrNode.Opcode.LABEL, this.startBlockname));
+        self.irNodeList.add(new LTypeIrNode(IrNode.Opcode.LABEL, fscope, this.startBlockname));
         //  <code for bool_expr_1>
         if(condition != null) {
             ((ConditionOpAstNode)condition).jumpLabel = this.blockname;
@@ -42,10 +47,10 @@ public class IfAstNode extends AstNode{
         }
         // j<!op> ELSE_1
         if(otherwise != null) {
-            self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JUMP, otherwise.blockname));
+            self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JUMP, fscope, otherwise.blockname));
         }
         else if (condition != null){
-            self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JUMP, this.endBlockname));
+            self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JUMP, fscope, this.endBlockname));
         }
         // <blockname> added with scope generated IR
         // <code for stmt_list_1>
@@ -56,7 +61,7 @@ public class IfAstNode extends AstNode{
         // <otherwise>
         if(otherwise != null) {
             // jmp END_<blockname>
-            self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JUMP, this.endBlockname));
+            self.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JUMP, fscope, this.endBlockname));
 
             // otherwise is also another IfAstNode with some elements set as NULL
             // In otherwsie: condition, otherwise is NULL
@@ -64,7 +69,7 @@ public class IfAstNode extends AstNode{
             self.irNodeList.addAll(otherwise.generateIrCode(scope).irNodeList);
         }
         // END_<blockname>
-        self.irNodeList.add(new LTypeIrNode(IrNode.Opcode.LABEL, this.endBlockname));
+        self.irNodeList.add(new LTypeIrNode(IrNode.Opcode.LABEL, fscope, this.endBlockname));
         return self;
     }
 }

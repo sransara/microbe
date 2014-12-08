@@ -1,14 +1,15 @@
 package SymbolScope;
 
 import AST.AstNode;
-import IR.*;
+import IR.IrCode;
+import IR.IrNode;
 import Nucleus.Operand;
 import Nucleus.Symbol;
 import Nucleus.Temporary;
 
 import java.util.*;
 
-public class ScopeNode {
+public abstract class ScopeNode {
     SymbolScopeTree.ScopeType scopeType;
     ScopeNode parent;
     public String name = null;
@@ -17,57 +18,35 @@ public class ScopeNode {
     public List<AstNode> statements = null;
     public IrCode irCode;
 
-    ScopeNode(SymbolScopeTree.ScopeType scopeType) {
-        this.scopeType = scopeType;
-        this.parent = null;
-        this.name = "GLOBAL";
-    }
+    public abstract Temporary getCurrentTemp();
+    public abstract Temporary createTemp(Operand.DataType t);
 
-    public Temporary getCurrentTemp() { return null; }
-    public Temporary createTemp(Operand.DataType t) { return null; }
-
-    void addSymbol(Operand.DataType type, String id, String reference, String value) {
+    void addSymbol(Operand.DataType type, String id, String reference, String value, Operand.OperandType operandType) {
         if(symbolTable.containsKey(id)) {
             System.out.println("DECLARATION ERROR " + id);
             System.exit(0);
         }
         switch (type) {
             case INT: {
-                Symbol s = new Symbol(type, reference, 0);
+                Symbol s = new Symbol(type, reference, 0, operandType);
                 symbolTable.put(id, s);
                 break;
             }
             case FLOAT: {
-                Symbol s = new Symbol(type, reference, 0.0f);
+                Symbol s = new Symbol(type, reference, 0.0f, operandType);
                 symbolTable.put(id, s);
                 break;
             }
             case STRING: {
-                Symbol s = new Symbol(type, reference, value);
+                Symbol s = new Symbol(type, reference, value, operandType);
                 symbolTable.put(id, s);
             }
         }
     }
 
-    public void addVariables(String type, List<String> ids) {
-        Operand.DataType t = Operand.DataType.valueOf(type);
-        for (String id : ids) {
-            // reference and reference are the same for global variables
-            addSymbol(t, id, id, null);
-        }
-    }
+    public abstract void addVariables(String type, List<String> ids);
 
-    public String addString(String id, String value) {
-        Operand.DataType t = Operand.DataType.STRING;
-        ScopeNode g = this;
-        while(g.parent != null) {
-            g = g.parent;
-        }
-
-        // reference and reference are the same for global variables
-        g.addSymbol(t, id, id, value);
-        return id;
-    }
+    public abstract String addString(String id, String value);
 
     public Symbol findSymbol(String id) {
         Symbol s = null;
@@ -80,21 +59,58 @@ public class ScopeNode {
         return s;
     }
 
-    public FunctionScopeNode getParentFunction() {
-        ScopeNode f = this;
-        if(f.parent == null) {
-            return null;
-        }
-        while(f.scopeType != SymbolScopeTree.ScopeType.FUNCTION) {
-            f = f.parent;
-        }
-        return (FunctionScopeNode)f;
-    }
+    public abstract FunctionScopeNode getParentFunction();
 
-    public void generateIrCode() {
-        irCode = new IrCode();
-        irCode.irNodeList.add(new STypeIrNode(IrNode.Opcode.PUSH, null, 0));
-        irCode.irNodeList.add(new JTypeIrNode(IrNode.Opcode.JSR, "main"));
-        irCode.irNodeList.add(new ITypeIrNode(IrNode.Opcode.HALT, null));
+    public abstract void generateIrCode();
+
+    public abstract void printIrCode();
+
+    public abstract void printTinyCode();
+
+    protected void buildControlFlowGraph() {
+        // build control flow graph
+        ListIterator<IrNode> irNodeListIterator = irCode.irNodeList.listIterator();
+        Map<String, IrNode> labelMap = new HashMap<String, IrNode>();
+        IrNode p = null;
+        if (irNodeListIterator.hasNext()) {
+            p = irNodeListIterator.next();
+            p.starter = true;
+            if(p.isLabel()) {
+                labelMap.put(p.label, p);
+            }
+        }
+        while(irNodeListIterator.hasNext()) {
+            IrNode c = irNodeListIterator.next();
+            if(p.isReturn() || p.isJmp()) {
+                // RET has no NEXT IrNode
+                // JMP has a label jump
+                c.starter = true;
+                p.ender = true;
+            }
+            else {
+                c.prevs.add(p);
+                p.nexts.add(c);
+            }
+            if (c.isLabel()) {
+                labelMap.put(c.label, c);
+            }
+            p = c;
+        }
+        for(IrNode n : irCode.irNodeList) {
+            if(n.usesLabel()) {
+                IrNode l = labelMap.get(n.label);
+                if(n.nexts.size() == 1) {
+                    n.nexts.get(0).starter = true;
+                }
+                if(l.prevs.size() == 1) {
+                    l.prevs.get(0).ender = true;
+                }
+                l.starter = true;
+                l.prevs.add(n);
+                n.nexts.add(l);
+                n.ender = true;
+            }
+        }
+        // end building the control flow graph
     }
 }

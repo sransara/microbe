@@ -1,12 +1,15 @@
 package IR;
 
-public class JTypeIrNode extends IrNode{
-    String label;
+import Nucleus.Register;
+import SymbolScope.FunctionScopeNode;
 
-    public JTypeIrNode(Opcode opcode, String label) {
+import java.util.Collections;
+
+public class JTypeIrNode extends IrNode{
+    public JTypeIrNode(Opcode opcode, FunctionScopeNode scope, String label) {
         // Kind of dump to do it this way because there's only one IR Opcode for JUMP
         // but let's stick with it for easy extension and consistency
-        super(opcode);
+        super(opcode, scope);
         this.label = label;
     }
 
@@ -17,15 +20,35 @@ public class JTypeIrNode extends IrNode{
 
     @Override
     public String toTiny() {
-        String r = null;
+        if (!isStarter()) {
+            registers = prevs.get(0).registers;
+        }
+        if (isEnder()) {
+            restoreRegisteredVariables();
+        }
         switch (opcode) {
             case JUMP:
-                r = "jmp " + label;
+                tinyCode.append("jmp " + label + "\n");
                 break;
             case JSR:
-                r = "jsr " + label;
+                restoreRegisteredGlobalVariables();
+                saveRegisters();
+                tinyCode.append("jsr " + label + "\n");
+                restoreRegisters();
                 break;
         }
-        return r;
+        return tinyCode.toString();
+    }
+
+    private void saveRegisters() {
+        for(int i = 0; i < Register.REG_N; i++) {
+            tinyCode.append("push " + Register.getReference(i) + "\n");
+        }
+    }
+
+    private void restoreRegisters() {
+        for(int i = Register.REG_N - 1; i >= 0; i--) {
+            tinyCode.append("pop " + Register.getReference(i) + "\n");
+        }
     }
 }

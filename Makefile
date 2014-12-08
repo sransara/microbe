@@ -1,6 +1,6 @@
 LIB_ANTLR := lib/antlr.jar
 ANTLR_SCRIPT := Microbe
-PATH_SEP := :
+PATH_SEP := ;
 all: parser compiler
 
 parser:
@@ -14,7 +14,9 @@ compiler:
 
 test:
 	touch 'test/temp.myout'
+	touch 'test/temp.out'
 	rm -f test/*.myout
+	rm -f test/*.out
 	python test/testall.py
 
 rsubmit:
@@ -32,11 +34,13 @@ submit:
 
 clean:
 	touch 'test/temp.myout'
+	touch 'test/temp.out'
 	touch 'test/temp.m.out'
 	touch 'test/temp.t.out'
 	rm -f test/*.myout
-	rm -f test/*.t.out
-	rm -f test/*.m.out
+	rm -f test/*.out
+	rm -rf test/*.t.out
+	rm -rf test/*.m.out
 	rm -rf classes sabeysir
 	touch 'src/Microbe.temp'
 	rm -f src/Microbe*
