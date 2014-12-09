@@ -144,9 +144,16 @@ public abstract class IrNode {
     }
 
     protected String allocateRegister(Operand operand, Operand...others) {
-        int ri = registers.indexOf(null);
+        int ri = 0;
+        int nullri = registers.indexOf(null);
+        int opri = registers.indexOf(new Register(operand));
         String regRef = null;
-        if(ri > -1) {
+        if(nullri > -1) {
+            ri = nullri;
+            regRef = Register.getReference(ri);
+        }
+        else if(opri > -1) {
+            ri = opri;
             regRef = Register.getReference(ri);
         }
         else {
@@ -208,17 +215,12 @@ public abstract class IrNode {
     }
 
     // Not live anymore
-    protected void dropDeadRegisters(Operand result, String...regRefs) {
+    protected void dropDeadRegisters(String... regRefs) {
         for(String regRef : regRefs) {
             if(regRef == null) { continue; }
             Register r = registers.get(Register.getDereference(regRef));
-            if(r != null) {
-                if(result != null && !r.operand.equals(result)) {
-                    continue;
-                }
-                else if(!liveOut.contains(r.operand)) {
-                    freeRegister(regRef);
-                }
+            if(r != null && !liveOut.contains(r.operand)) {
+                freeRegister(regRef);
             }
         }
     }

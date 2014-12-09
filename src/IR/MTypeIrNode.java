@@ -1,10 +1,7 @@
 package IR;
 
 import Nucleus.Operand;
-import Nucleus.Register;
 import SymbolScope.FunctionScopeNode;
-
-import java.util.Collections;
 
 public class MTypeIrNode extends IrNode{
     // STOREI, STOREF
@@ -32,7 +29,7 @@ public class MTypeIrNode extends IrNode{
             registers = prevs.get(0).registers;
         }
         String rop1 = ensureRegister(op1);
-        dropDeadRegisters(result, rop1);
+        dropDeadRegisters(rop1);
         String op1Ref = rop1 == null ? op1.reference : rop1;
         String rResult;
         if(result.reference.startsWith("$R")) {
@@ -41,6 +38,9 @@ public class MTypeIrNode extends IrNode{
         else {
             rResult = allocateRegister(result);
             dirtRegister(rResult);
+        }
+        if(op1Ref.equals(rResult)) {
+            tinyCode.append("; ");
         }
         tinyCode.append("move " + op1Ref + " " + rResult + "\n");
         if (isEnder()) {

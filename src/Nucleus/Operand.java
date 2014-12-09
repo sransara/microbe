@@ -22,6 +22,7 @@ public class Operand {
 
     @Override
     public boolean equals(Object o) {
+        if(o == null) { return false; }
         return ((Operand)o).reference.equals(reference);
     }
 

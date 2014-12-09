@@ -11,6 +11,10 @@ BEGIN
                 d := 50;
 
 		c := c + a*b + (a*b+c)/a + 20 * d;
+                c := d*a + (b/c);
+
+                b := a*d;
+                b := c;
 
 		WRITE (c);
 		WRITE (b);

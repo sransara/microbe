@@ -1,10 +1,7 @@
 package IR;
 
 import Nucleus.Operand;
-import Nucleus.Register;
 import SymbolScope.FunctionScopeNode;
-
-import java.util.Collections;
 
 public class STypeIrNode extends IrNode{
     // the stack stuff
@@ -61,7 +58,7 @@ public class STypeIrNode extends IrNode{
             case PUSH:
                 if (operand != null) {
                     String rop = ensureRegister(operand);
-                    dropDeadRegisters(null, rop);
+                    dropDeadRegisters(rop);
                     String opRef = rop == null ? operand.reference : rop.toString();
                     c = "push " + opRef;
                 } else {

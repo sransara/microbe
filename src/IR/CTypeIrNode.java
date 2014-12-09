@@ -1,13 +1,8 @@
 package IR;
 
 import Nucleus.Operand;
-import Nucleus.Register;
 import SymbolScope.FunctionScopeNode;
 
-import java.util.Collections;
-import java.util.LinkedList;
-
-import static Nucleus.Operand.DataType;
 import static Nucleus.Operand.DataType.FLOAT;
 import static Nucleus.Operand.DataType.INT;
 
@@ -38,7 +33,7 @@ public class CTypeIrNode extends IrNode{
         }
         String rop1 = ensureRegister(op1, op2);
         String rop2 = ensureRegister(op2, op1);
-        dropDeadRegisters(null, rop1, rop2);
+        dropDeadRegisters(rop1, rop2);
         String op1Ref = rop1 == null ? op1.reference : rop1;
         String op2Ref = rop1 == null ? op2.reference : rop2;
         if (isEnder()) {

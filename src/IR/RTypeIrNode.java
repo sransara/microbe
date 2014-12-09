@@ -3,8 +3,6 @@ package IR;
 import Nucleus.Operand;
 import SymbolScope.FunctionScopeNode;
 
-import java.util.Collections;
-
 public class RTypeIrNode extends IrNode{
     Operand op1;
     Operand op2;
@@ -32,7 +30,7 @@ public class RTypeIrNode extends IrNode{
         }
 
         String rop1 = ensureRegister(op1, op2);
-        dropDeadRegisters(result, rop1);
+        // dropDeadRegisters(rop1);
         String op1Ref = rop1 == null ? op1.reference : rop1.toString();
         String rResult = allocateRegister(result, op2);
         dirtRegister(rResult);
@@ -47,7 +45,7 @@ public class RTypeIrNode extends IrNode{
         if(op2.equals(op1)) {
             rop2 = rop1;
         }
-        dropDeadRegisters(result, rop2);
+        dropDeadRegisters(rop1, rop2);
         String op2Ref = rop2 == null ? op2.reference : rop2.toString();
 
         switch (opcode) {

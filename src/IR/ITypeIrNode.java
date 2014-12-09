@@ -1,10 +1,7 @@
 package IR;
 
 import Nucleus.Operand;
-import Nucleus.Register;
 import SymbolScope.FunctionScopeNode;
-
-import java.util.Collections;
 
 import static java.lang.String.format;
 
@@ -48,13 +45,13 @@ public class ITypeIrNode extends IrNode{
         switch (opcode) {
             case WRITEF:
                 rop = ensureRegister(result);
-                dropDeadRegisters(null, rop);
+                dropDeadRegisters(rop);
                 opRef = rop == null ? result.reference : rop;
                 a = format("sys writer %s", opRef);
                 break;
             case WRITEI:
                 rop = ensureRegister(result);
-                dropDeadRegisters(null, rop);
+                dropDeadRegisters(rop);
                 opRef = rop == null ? result.reference : rop;
                 a = format("sys writei %s", opRef);
                 break;
