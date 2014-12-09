@@ -48,7 +48,8 @@ public class Micro {
         try {
             parser.program();
         } catch (ParseCancellationException e) {
-            System.err.print("Not accepted");
+            parser = null;
+            System.out.print("Not accepted");
         }
         return parser;
     }

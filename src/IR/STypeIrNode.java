@@ -49,36 +49,44 @@ public class STypeIrNode extends IrNode{
         String c = null;
         switch (opcode) {
             case LINK:
-                c = "link " + functionScope.size;
+                tinyCode.append("link " + functionScope.size + "\n");
+                if (isEnder()) {
+                    restoreRegisteredVariables();
+                }
                 break;
             case RET:
-                c = "unlnk \n";
-                c += "ret";
+                if (isEnder()) {
+                    restoreRegisteredVariables();
+                }
+                tinyCode.append("unlnk\n");
+                tinyCode.append("ret\n");
                 break;
             case PUSH:
                 if (operand != null) {
                     String rop = ensureRegister(operand);
                     dropDeadRegisters(rop);
                     String opRef = rop == null ? operand.reference : rop.toString();
-                    c = "push " + opRef;
+                    tinyCode.append("push " + opRef + "\n");
                 } else {
-                    c = "push";
+                    tinyCode.append("push\n");
+                }
+                if (isEnder()) {
+                    restoreRegisteredVariables();
                 }
                 break;
             case POP:// PUSH POP
                 if (operand != null) {
                     String rResult = allocateRegister(operand);
                     dirtRegister(rResult);
-                    c = "pop " + rResult;
+                    tinyCode.append("pop " + rResult + "\n");
                 } else {
-                    c = "pop";
+                    tinyCode.append("pop\n");
+                }
+                if (isEnder()) {
+                    restoreRegisteredVariables();
                 }
                 break;
         }
-        if (isEnder()) {
-            restoreRegisteredVariables();
-        }
-        tinyCode.append(c + "\n");
         return tinyCode.toString();
     }
 }

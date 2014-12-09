@@ -148,12 +148,12 @@ public abstract class IrNode {
         int nullri = registers.indexOf(null);
         int opri = registers.indexOf(new Register(operand));
         String regRef = null;
-        if(nullri > -1) {
-            ri = nullri;
+        if(opri > -1) {
+            ri = opri;
             regRef = Register.getReference(ri);
         }
-        else if(opri > -1) {
-            ri = opri;
+        else if(nullri > -1) {
+            ri = nullri;
             regRef = Register.getReference(ri);
         }
         else {
@@ -242,6 +242,7 @@ public abstract class IrNode {
             if(r == null || r.operand == null) { continue; }
             else if (r.operand.operandType == Operand.OperandType.GLOBAL_SYMBOL && r.isDirty) {
                 tinyCode.append("move " + regRef + " " + operandToTiny(r.operand) + " ; DBG GLOBAL RESTORE \n");
+                registers.set(i, null);
             }
         }
     }

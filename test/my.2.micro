@@ -1,0 +1,55 @@
+PROGRAM p
+BEGIN
+
+	FLOAT a,b,c,d;
+        STRING eol := "\n";
+        STRING fff := "fma";
+        STRING mmm := "main\n";
+	
+	FUNCTION VOID main()
+	BEGIN
+		a := 20;
+		b := 30;
+		c := 40;
+                d := 50;
+
+		c := c + a*b + (a*b+c)/a + 20 * d;
+                b := a*d;
+                b := c;
+                a := fma(c*c + a, d*d + b);
+		WRITE (mmm, c, eol);
+		WRITE (b, eol);
+		WRITE (a, eol);
+		WRITE (d, eol);
+                d := fma(c*c + a, d*d + b);   
+
+		WRITE (mmm, c, eol);
+		WRITE (b, eol);
+		WRITE (a, eol);
+		WRITE (d, eol);
+	
+	END
+
+        FUNCTION FLOAT add (FLOAT a, FLOAT b)
+	BEGIN
+	  FLOAT result;
+		result := a+b;
+		RETURN result;
+	END
+
+	FUNCTION FLOAT multiply (FLOAT a, FLOAT b)
+	BEGIN
+	  FLOAT result;
+		result := a*b;
+		RETURN result;
+	END
+	
+	FUNCTION FLOAT fma (FLOAT b, FLOAT c)
+	BEGIN
+		FLOAT addresult;
+		addresult := add(multiply(a, b), c);
+		WRITE (fff, c, eol);
+		WRITE(fff, eol, a, eol, b, eol, c, eol, addresult, eol, c, eol);
+		RETURN add(multiply(a, b), c);
+	END
+END
