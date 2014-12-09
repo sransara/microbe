@@ -26,6 +26,15 @@ errors = False
 testdir = '.' + os.sep + 'test' + os.sep
 nonsense = 'cmd /C ' if sys.platform.startswith('win') else ''
 
+inputfile = testdir + 'input.txt'
+import random
+random.seed()
+randomnumbers = [random.randint(1,20) for x in xrange(20)]
+f = open(inputfile,'w')
+for r in randomnumbers:
+    f.write(str(r) + '\n')
+f.close()
+
 for fname in os.listdir(testdir):
     if(fname.endswith('.micro') and (len(sys.argv) == 1 or fname.startswith(sys.argv[1]))):
         micro = testdir + fname
@@ -39,8 +48,8 @@ for fname in os.listdir(testdir):
         if os.name == "posix": connector = ":"
         oucommand = 'java -jar '+ testdir +'final.jar ' + micro + ' > ' + ouout
         excommand = 'java -ea -cp lib/antlr.jar' + connector + 'classes/ Micro '+ micro + ' > ' + myout
-        t1xcommand = nonsense + testdir + 'tinyR ' + myout + ' nostats > ' + mout
-        t2xcommand = nonsense + testdir + 'tinyR ' + trout + ' nostats > ' + tout
+        t1xcommand = nonsense + testdir + 'tinyR ' + myout + ' nostats < ' + inputfile + ' > ' + mout
+        t2xcommand = nonsense + testdir + 'tinyR ' + trout + ' nostats < ' + inputfile + ' > ' + tout
         dfcommand = 'diff -y -W 150 ' + mout + ' ' + tout
 
         print "Testing file:", fname
