@@ -6,6 +6,8 @@ out/
 build/
 *.class
 
+input.text
+*.out
 *.myout
 *.t.out
 *.m.out
