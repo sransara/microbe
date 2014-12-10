@@ -40,7 +40,6 @@ for fname in os.listdir(testdir):
         micro = testdir + fname
         ouout = testdir + fname.replace('.micro', '.out')
         myout = testdir + fname.replace('.micro', '.myout')
-        trout = testdir + fname.replace('.micro', '.out')
         mout = testdir + fname.replace('.micro', '.m.myout')
         tout = testdir + fname.replace('.micro', '.t.out')
 
@@ -48,8 +47,8 @@ for fname in os.listdir(testdir):
         if os.name == "posix": connector = ":"
         oucommand = 'java -jar '+ testdir +'final.jar ' + micro + ' > ' + ouout
         excommand = 'java -ea -cp lib/antlr.jar' + connector + 'classes/ Micro '+ micro + ' > ' + myout
+        t2xcommand = nonsense + testdir + 'tinyR ' + ouout + ' nostats < ' + inputfile + ' > ' + tout
         t1xcommand = nonsense + testdir + 'tinyR ' + myout + ' nostats < ' + inputfile + ' > ' + mout
-        t2xcommand = nonsense + testdir + 'tinyR ' + trout + ' nostats < ' + inputfile + ' > ' + tout
         dfcommand = 'diff -y -W 150 ' + mout + ' ' + tout
 
         print "Testing file:", fname
@@ -58,10 +57,10 @@ for fname in os.listdir(testdir):
             subprocess.check_output(oucommand, shell=True);
             print(excommand)
             subprocess.check_output(excommand, shell=True);
-            print(t1xcommand)
-            subprocess.check_output(t1xcommand, shell=True);
             print(t2xcommand)
             subprocess.check_output(t2xcommand, shell=True);
+            print(t1xcommand)
+            subprocess.check_output(t1xcommand, shell=True);
         except:
             print "--- Run time error"
             exit(1)
