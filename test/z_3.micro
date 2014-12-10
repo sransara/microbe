@@ -1,0 +1,104 @@
+PROGRAM p
+BEGIN
+	INT trueOrFalse, pseudo;
+	STRING star := "*";
+	STRING true := "true";
+	STRING false := "false";
+	STRING eol := "\n";
+	STRING space := " ";
+	STRING smax := " MAX ";
+	STRING smin := " MAX ";
+	STRING eFlint := " IS EVEN? ";
+	STRING oFlint := " IS ODD? ";
+	INT bloat;
+
+	FUNCTION VOID main()
+	BEGIN
+		INT boat, starcount;
+		INT iii, flint, lint, wlint;
+		bloat := 2222;
+		lint := 125;
+		wlint := 13;
+		iii := max(wlint, lint);
+		flint := max(iii, 1337);		
+
+		WHILE (iii > 0)
+			-- is even
+			-- flint := max(iii, flint);
+			WRITE(smax, iii, space, flint, eFlint);
+			trueOrFalse := IsEven(max(iii, flint));
+			bloat := boat + (55 + flint) * ((66 + iii)  / 34) + wlint * (lint / iii) * boat;
+			pseudo := PrintBoolean(1);
+
+			-- is odd
+			WRITE(smin, iii, space, flint, oFlint);
+			trueOrFalse := IsOdd(min(iii, flint));
+			pseudo := PrintBoolean(1);
+			flint := min(iii, flint);
+
+			iii := iii - min(iii, min(wlint, lint));
+			WRITE(star, iii, star, eol);
+			pseudo := PrintBloat(1);
+			starcount := min(lint, wlint);
+			WHILE(starcount > 0)
+				starcount := starcount - 1;
+				WRITE(star);
+			ENDWHILE
+			WRITE(eol);
+		ENDWHILE
+	END
+
+        FUNCTION INT max (INT a, INT b)
+	BEGIN
+		IF(a > b) 
+			RETURN a;
+		ELSE
+			RETURN b;
+		ENDIF
+	END
+	FUNCTION INT min (INT a, INT b)
+	BEGIN
+		IF(a < b) 
+			RETURN a;
+		ELSE 
+			RETURN b;
+		ENDIF
+	END
+	
+	-- check global restores
+	-- reference compiler didn't like calls to this without any arguments
+	FUNCTION INT PrintBoolean(INT dontcare)
+	BEGIN
+		IF(trueOrFalse = 1)
+			WRITE(true, eol);
+			RETURN 1;
+		ELSE
+			WRITE(false, eol);
+			RETURN 0;
+		ENDIF
+	END
+	FUNCTION INT PrintBloat(INT f)
+	BEGIN
+		WRITE(bloat, eol);
+		RETURN 22;
+	END
+	-- mutually recursive functions
+	-- http://stackoverflow.com/questions/2667900/
+	FUNCTION INT IsEven(INT a) 
+	BEGIN
+		IF(a = 0)
+			RETURN 1;
+		ELSE
+			RETURN IsOdd(a - 1);
+		ENDIF
+	END
+
+	FUNCTION INT IsOdd(INT a)
+	BEGIN
+		IF(a = 0)
+			RETURN 0;
+		ELSE
+			RETURN IsEven(a - 1);
+		ENDIF
+	END
+END

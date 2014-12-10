@@ -1,0 +1,56 @@
+PROGRAM p
+BEGIN
+	INT ggg, lll;
+	STRING eol := "\n";
+	FUNCTION VOID main()
+	BEGIN
+		INT a, b, c, d, e, i, t, z;
+		i := 13;
+		t := 22 + 33 - 24 / 3 + 14;
+		WHILE(i > 0)
+			t := 2 * t + (t * t) /t - t;
+			z := t * t + t - t / t;
+			a := (t+z+t+t/2.0+z/4.0+z/5.0+z/6.0+z/7.0);
+			WRITE(eol, a, eol);
+			b := 22;
+			c := 1337;
+			d := 44;
+			e := 12;
+			ggg := a * z * t + b;
+			lll := Calc(a, (t+z+t+t+z+z/5.0+z*6+z), b*d+e+z, c+b*d, d*t+a/a, a*c, t) 
+				+ Calc(a, (t+z+t+t+z+z/5.0+z*6+z), b*d+e+z, c+b*d, d*t+a/a, a*c, t);
+			IF(IsEven(i) = 1)
+				i := i - 3;
+			ELSE
+				i := i + 1;
+			ENDIF
+			WRITE(lll, eol);
+		ENDWHILE
+	END
+
+        FUNCTION INT Calc (INT A, INT B, INT C, INT D, INT E, INT F, INT G)
+	BEGIN
+		WRITE(A, B, C, D, E, F, G, eol);
+		RETURN (A*B + C*(D + D)*E + E*F +G * ggg);
+	END
+
+	-- mutually recursive functions
+	-- http://stackoverflow.com/questions/2667900/
+	FUNCTION INT IsEven(INT a) 
+	BEGIN
+		IF(a = 0)
+			RETURN 1;
+		ELSE
+			RETURN IsOdd(a - 1);
+		ENDIF
+	END
+
+	FUNCTION INT IsOdd(INT a)
+	BEGIN
+		IF(a = 0)
+			RETURN 0;
+		ELSE
+			RETURN IsEven(a - 1);
+		ENDIF
+	END
+END
