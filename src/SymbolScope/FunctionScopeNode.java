@@ -132,19 +132,18 @@ public class FunctionScopeNode extends ScopeNode {
         // end liveness analysis
 
         // count number of temp spills
-        int maxTempSpills = 0;
+        Set<String> spillingTemps = new HashSet<String>();
         for(IrNode e : irCode.irNodeList) {
             if(e.liveOut.size() > Register.REG_N) {
                 int tempCount = 0;
                 for(Operand o : e.liveOut) {
                     if(o.operandType == Operand.OperandType.TEMPORARY) {
-                        tempCount++;
+                        spillingTemps.add(o.reference);
                     }
                 }
-                maxTempSpills = maxTempSpills < tempCount ? tempCount : maxTempSpills;
             }
         }
-        size = local_x + maxTempSpills;
+        size = local_x + spillingTemps.size();
         // end count number of temp spills
     }
 

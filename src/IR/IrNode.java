@@ -70,10 +70,10 @@ public abstract class IrNode {
     // end used to build control flow graph
 
     // used in liveness analysis
-    public Set<Operand> gen = new HashSet<Operand>();
-    public Set<Operand> kill = new HashSet<Operand>();
-    public Set<Operand> liveIn = new HashSet<Operand>();
-    public Set<Operand> liveOut = new HashSet<Operand>();
+    public Set<Operand> gen = new LinkedHashSet<Operand>();
+    public Set<Operand> kill = new LinkedHashSet<Operand>();
+    public Set<Operand> liveIn = new LinkedHashSet<Operand>();
+    public Set<Operand> liveOut = new LinkedHashSet<Operand>();
 
     protected void initGen(Operand...operands) {
         for(Operand o : operands) {
@@ -138,7 +138,8 @@ public abstract class IrNode {
         }
         else {
             String newr = allocateRegister(operand, others);
-            tinyCode.append("move " + operandToTiny(operand) + " " + newr + " ; DBG ENSURE "+ operand.reference +" -> "+ newr + "\n");
+            tinyCode.append("; DBG ALLOC ENSURE "+ operand.reference + " -> "+ newr +"\n");
+            tinyCode.append("move " + operandToTiny(operand) + " " + newr + "\n");
             return newr;
         }
     }
@@ -157,32 +158,33 @@ public abstract class IrNode {
             regRef = Register.getReference(ri);
         }
         else {
-            int i;
-            for(i = 0; i < Register.REG_N; i++) {
+            // the lower indexed liveOut elements are more likely to be used recently
+            Operand[] liveOut_a = liveOut.toArray(new Operand[liveOut.size()]);
+            int max_j = -1;
+            int max_j_i = -1;
+            for(int i = 0; i < Register.REG_N; i++) {
                 Register r = registers.get(i);
-                regRef =  Register.getReference(i);
-                if(!r.isDirty && !Arrays.asList(others).contains(r.operand)) {
-                    tinyCode.append("; DBG KICK OUT " + r.operand + " @ " + regRef + " others:" + Arrays.toString(others) + "\n");
-                    freeRegister(regRef);
-                    ri = i;
+                if(Arrays.asList(others).contains(r.operand)) {
+                    continue;
+                }
+                if(!liveOut.contains(r.operand)) {
+                    max_j_i = i;
                     break;
                 }
-            }
-            if(i == Register.REG_N) { // No !dirty register to kick out
-                // TODO: free the most distantly used register
-                // Right now its just the lowest indexed reg
-                for(i = 0; i < Register.REG_N; i++) {
-                    Register r = registers.get(i);
-                    regRef =  Register.getReference(i);
-                    if(!Arrays.asList(others).contains(r.operand)) {
-                        tinyCode.append("; DBG KICK OUT " + r.operand + " @ " + regRef + " others:" + Arrays.toString(others) + "\n");
-                        freeRegister(regRef);
-                        ri = i;
-                        break;
+                for(int j = 0; j < liveOut_a.length; j++) {
+                    if (r.operand.equals(liveOut_a[j])) {
+                        if(max_j < j) {
+                            max_j = j;
+                            max_j_i = i;
+                        }
                     }
                 }
             }
-
+            ri = max_j_i;
+            regRef = Register.getReference(max_j_i);
+            tinyCode.append("; DBG KICK OUT " + registers.get(ri).operand + " @ " + regRef);
+            tinyCode.append(" others:" + Arrays.toString(others) + "\n");
+            freeRegister(regRef);
         }
         tinyCode.append("; DBG ALLOCATE "+ operand.reference +" -> "+ regRef +"\n");
         registers.set(ri, new Register(operand));
