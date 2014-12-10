@@ -30,22 +30,28 @@ public class RTypeIrNode extends IrNode{
         }
 
         String rop1 = ensureRegister(op1, op2);
-        // dropDeadRegisters(rop1);
+        dropDeadRegisters(rop1);
         String op1Ref = rop1 == null ? op1.reference : rop1.toString();
         String rResult = allocateRegister(result, op2);
         dirtRegister(rResult);
 
-        if(!op1Ref.equals(rResult)) {
-            tinyCode.append("move ");
-            tinyCode.append(op1Ref + " ");
-            tinyCode.append(rResult + "\n");
+        if(op1Ref.equals(rResult)) {
+            tinyCode.append("; ");
         }
+        tinyCode.append("move ");
+        tinyCode.append(op1Ref + " ");
+        tinyCode.append(rResult + "\n");
 
-        String rop2 = ensureRegister(op2, result);
+
+        String rop2;
         if(op2.equals(op1)) {
             rop2 = rop1;
         }
-        dropDeadRegisters(rop1, rop2);
+        else {
+            rop2 = ensureRegister(op2, result);
+            dropDeadRegisters(rop2);
+        }
+
         String op2Ref = rop2 == null ? op2.reference : rop2.toString();
 
         switch (opcode) {

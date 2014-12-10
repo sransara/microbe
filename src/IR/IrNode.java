@@ -34,7 +34,7 @@ public abstract class IrNode {
         if(starter) {
             tinyCode.append("; DBG STARTING BB\n");
         }
-        tinyCode.append(this + "\n; DBG liveout "+ Arrays.toString(liveOut.toArray()) + "\n");
+        tinyCode.append("; -- " + this + "\n; DBG liveout "+ Arrays.toString(liveOut.toArray()) + "\n");
         return starter;
     }
     public boolean isEnder() {
@@ -165,13 +165,14 @@ public abstract class IrNode {
             for(int i = 0; i < Register.REG_N; i++) {
                 Register r = registers.get(i);
                 if(Arrays.asList(others).contains(r.operand)) {
-                    continue;
+                    continue; // others.length must be less than REG_N
                 }
                 if(!liveOut.contains(r.operand)) {
                     max_j_i = i;
                     break;
                 }
                 for(int j = 0; j < liveOut_a.length; j++) {
+                    // as we didn't hit the `break` one of these must be true
                     if (r.operand.equals(liveOut_a[j])) {
                         if(max_j < j) {
                             max_j = j;
@@ -244,7 +245,7 @@ public abstract class IrNode {
             if(r == null || r.operand == null) { continue; }
             else if (r.operand.operandType == Operand.OperandType.GLOBAL_SYMBOL && r.isDirty) {
                 tinyCode.append("move " + regRef + " " + operandToTiny(r.operand) + " ; DBG GLOBAL RESTORE \n");
-                registers.set(i, null);
+                r.isDirty = false;
             }
         }
     }

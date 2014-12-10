@@ -46,18 +46,12 @@ public class STypeIrNode extends IrNode{
             registers = prevs.get(0).registers;
         }
 
-        String c = null;
         switch (opcode) {
             case LINK:
-                tinyCode.append("link " + functionScope.size + "\n");
-                if (isEnder()) {
-                    restoreRegisteredVariables();
-                }
+                tinyCode.append("link " + functionScope.local_x + "\n");
                 break;
             case RET:
-                if (isEnder()) {
-                    restoreRegisteredVariables();
-                }
+                restoreRegisteredGlobalVariables();
                 tinyCode.append("unlnk\n");
                 tinyCode.append("ret\n");
                 break;
@@ -65,7 +59,7 @@ public class STypeIrNode extends IrNode{
                 if (operand != null) {
                     String rop = ensureRegister(operand);
                     dropDeadRegisters(rop);
-                    String opRef = rop == null ? operand.reference : rop.toString();
+                    String opRef = rop == null ? operand.reference : rop;
                     tinyCode.append("push " + opRef + "\n");
                 } else {
                     tinyCode.append("push\n");

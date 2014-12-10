@@ -23,9 +23,14 @@ public class IrCode {
         }
     }
 
-    public void printTinyCode() {
+    public void printTinyCode(IrCode...headers) {
+        StringBuilder b = new StringBuilder();
         for(IrNode n : irNodeList) {
-            System.out.print(n.toTiny());
+            b.append(n.toTiny());
         }
+        for(IrCode c : headers) {
+            c.printTinyCode();
+        }
+        System.out.print(b.toString());
     }
 }

@@ -19,6 +19,7 @@ public class FunctionScopeNode extends ScopeNode {
     public int local_x = 1;
     public int parameter_x = 1;
     public int temp_x = 1;
+    private IrCode functionHeader;
 
     FunctionScopeNode(ScopeNode parent, Operand.DataType rt, String name) {
         this.scopeType = SymbolScopeTree.ScopeType.FUNCTION;
@@ -80,11 +81,21 @@ public class FunctionScopeNode extends ScopeNode {
         return this;
     }
 
+    private void generateFunctionHeader() {
+        functionHeader = new IrCode();
+        IrNode label = new LTypeIrNode(IrNode.Opcode.LABEL, this, name);
+        IrNode link = new STypeIrNode(IrNode.Opcode.LINK, this, null);
+        label.starter = true;
+        label.ender = true;
+        label.nexts.add(link);
+        link.prevs.add(label);
+        functionHeader.irNodeList.add(label);
+        functionHeader.irNodeList.add(link);
+    }
     @Override
     public void generateIrCode() {
+        generateFunctionHeader();
         irCode = new IrCode();
-        irCode.irNodeList.add(new LTypeIrNode(IrNode.Opcode.LABEL, this, name));
-        irCode.irNodeList.add(new STypeIrNode(IrNode.Opcode.LINK, this, null));
         for(AstNode n : statements) {
             irCode.irNodeList.addAll(n.generateIrCode(this).irNodeList);
         }
@@ -92,6 +103,7 @@ public class FunctionScopeNode extends ScopeNode {
             irCode.irNodeList.add(new STypeIrNode(IrNode.Opcode.RET, this, null));
         }
 
+        buildControlFlowGraph();
         buildControlFlowGraph();
 
         // do liveness analysis
@@ -130,30 +142,16 @@ public class FunctionScopeNode extends ScopeNode {
             }
         }
         // end liveness analysis
-
-        // count number of temp spills
-        Set<String> spillingTemps = new HashSet<String>();
-        for(IrNode e : irCode.irNodeList) {
-            if(e.liveOut.size() > Register.REG_N) {
-                int tempCount = 0;
-                for(Operand o : e.liveOut) {
-                    if(o.operandType == Operand.OperandType.TEMPORARY) {
-                        spillingTemps.add(o.reference);
-                    }
-                }
-            }
-        }
-        size = local_x + spillingTemps.size();
-        // end count number of temp spills
     }
 
     @Override
     public void printIrCode() {
+        functionHeader.printIrCode();
         irCode.printIrCode();
     }
 
     @Override
     public void printTinyCode() {
-        irCode.printTinyCode();
+        irCode.printTinyCode(functionHeader);
     }
 }
