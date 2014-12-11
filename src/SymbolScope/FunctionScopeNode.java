@@ -72,7 +72,7 @@ public class FunctionScopeNode extends ScopeNode {
             g = g.parent;
         }
         // reference and reference are the same for global variables
-        ((GlobalScopeNode)g).addString(ref, value);
+        g.addString(ref, value);
         return ref;
     }
 
@@ -102,8 +102,6 @@ public class FunctionScopeNode extends ScopeNode {
         if(returnType == Operand.DataType.VOID){
             irCode.irNodeList.add(new STypeIrNode(IrNode.Opcode.RET, this, null));
         }
-
-        buildControlFlowGraph();
         buildControlFlowGraph();
 
         // do liveness analysis

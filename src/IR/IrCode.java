@@ -24,6 +24,7 @@ public class IrCode {
     }
 
     public void printTinyCode(IrCode...headers) {
+        // build tiny for the rest of the code before building tiny for headers
         StringBuilder b = new StringBuilder();
         for(IrNode n : irNodeList) {
             b.append(n.toTiny());
