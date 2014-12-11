@@ -1,6 +1,6 @@
 LIB_ANTLR := lib/antlr.jar
 ANTLR_SCRIPT := Microbe
-PATH_SEP := :
+PATH_SEP := ;
 all: parser compiler
 
 parser:
@@ -37,12 +37,10 @@ clean:
 	touch 'test/temp.out'
 	touch 'test/temp.m.out'
 	touch 'test/temp.t.out'
-	rm -f test/*.myout
-	rm -f test/*.out
-	rm -rf test/*.t.out
-	rm -rf test/*.m.out
+	rm -f 'test/*.myout'
+	rm -f 'test/*.out'
 	rm -rf classes sabeysir
 	touch 'src/Microbe.temp'
-	rm -f src/Microbe*
+	rm -f 'src/Microbe*'
 
 .PHONY: all parser compiler clean test rsubmit submit
