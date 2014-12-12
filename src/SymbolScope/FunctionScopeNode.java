@@ -6,7 +6,6 @@ import IR.IrNode;
 import IR.LTypeIrNode;
 import IR.STypeIrNode;
 import Nucleus.Operand;
-import Nucleus.Register;
 import Nucleus.Symbol;
 import Nucleus.Temporary;
 
