@@ -1,0 +1,14 @@
+PROGRAM n
+BEGIN
+  STRING eol := "\n";
+  FUNCTION INT main()
+  BEGIN
+    FLOAT result1;
+    FLOAT result2;
+    result1 := (2*5)/(2+1);
+    WRITE(result1, eol);
+    result2 := (2.0*5.0)/(2.0+1.0);
+    WRITE(result2, eol);
+    RETURN 0;
+  END
+END
