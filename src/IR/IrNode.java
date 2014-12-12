@@ -70,6 +70,8 @@ public abstract class IrNode {
     // end used to build control flow graph
 
     // used in liveness analysis
+    // Needs linked hash set data structure for optimizing register kickout
+    // as order is retained through liveness analysis
     public Set<Operand> gen = new LinkedHashSet<Operand>();
     public Set<Operand> kill = new LinkedHashSet<Operand>();
     public Set<Operand> liveIn = new LinkedHashSet<Operand>();
