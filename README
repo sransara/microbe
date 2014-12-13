@@ -24,7 +24,7 @@ See some sample micro code
 #!micro
 PROGRAM p
 BEGIN
-    STRING prompt := "Give me a number to output bitstring in reverse order: ";
+    STRING prompt := "Give me a number to output bitstring in reverse order (LSB to MSB): ";
     STRING eol := "\n";
     STRING one := "1";
     STRING zero := "0";
@@ -38,7 +38,6 @@ BEGIN
         WHILE(a > 0)
             IF(IsEven(a) = 1)
                  WRITE(zero);
-            ENDIF
             ELSE
                 WRITE(one);
             ENDIF
