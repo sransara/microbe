@@ -24,7 +24,7 @@ See some sample micro code
 #!micro
 PROGRAM p
 BEGIN
-    STRING prompt := "Give me a number to output bitstring in reverse order (LSB to MSB): ";
+    STRING prompt := "Give me a number to output bitstring in LSB to MSB: ";
     STRING eol := "\n";
     STRING one := "1";
     STRING zero := "0";
